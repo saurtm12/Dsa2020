@@ -171,7 +171,7 @@ void MainWindow::update_view()
 
         for (auto stopid : stops)
         {
-            QColor stopcolor = Qt::darkGray;
+            QColor stopcolor = Qt::white;
             QColor namecolor = Qt::cyan;
             QColor stopborder = Qt::white;
             int stopzvalue = 1;
@@ -219,10 +219,10 @@ void MainWindow::update_view()
                 groupitem->setFlag(QGraphicsItem::ItemIsSelectable);
                 groupitem->setData(0, QVariant::fromValue(stopid));
 
-                QPen beaconpen(stopborder);
-                beaconpen.setWidth(0); // Cosmetic pen
+                QPen stoppen(stopborder);
+                stoppen.setWidth(0); // Cosmetic pen
                 auto dotitem = gscene_->addEllipse(-4*pointscale, -4*pointscale, 8*pointscale, 8*pointscale,
-                                                   beaconpen, QBrush(stopcolor));
+                                                   stoppen, QBrush(stopcolor));
                 dotitem->setFlag(QGraphicsItem::ItemIgnoresTransformations);
                 groupitem->addToGroup(dotitem);
                 //        dotitem->setFlag(QGraphicsItem::ItemIgnoresTransformations);
