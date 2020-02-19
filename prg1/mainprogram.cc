@@ -126,6 +126,11 @@ void MainProgram::test_get_functions(StopID id)
 {
     ds_.get_stop_name(id);
     ds_.get_stop_coord(id);
+    if (random_stops_added_ > 0)
+    {
+        auto regid = n_to_strid(random<decltype(random_stops_added_)>(0, (random_stops_added_-1)/10+1));
+        ds_.get_region_name(regid);
+    }
 }
 
 MainProgram::CmdResult MainProgram::cmd_add_stop(std::ostream& /*output*/, MatchIter begin, MatchIter end)
@@ -407,13 +412,11 @@ MainProgram::CmdResult MainProgram::cmd_region_bounding_box(std::ostream& output
 
 void MainProgram::test_region_bounding_box()
 {
-    // !!!!!!!
-//    if (random_stops_added_ > 0) // Don't do anything if there's no beacons
-//    {
-//        auto id = n_to_id(random<decltype(random_stops_added_)>(0, random_stops_added_));
-//        ds_.total_color(id);
-//        test_get_functions(id);
-//    }
+    if (random_stops_added_ > 0) // Don't do anything if there's no beacons
+    {
+        auto regid = n_to_strid(random<decltype(random_stops_added_)>(0, (random_stops_added_-1)/10+1));
+        ds_.region_bounding_box(regid);
+    }
 }
 
 
@@ -981,8 +984,8 @@ MainProgram::CmdResult MainProgram::cmd_perftest(std::ostream& output, MatchIter
     output << "WARNING: Debug STL enabled, performance will be worse than expected (maybe also asymptotically)!" << endl;
 #endif // _GLIBCXX_DEBUG
 
-    vector<string> optional_cmds({"remove_beacon", "path_inbeam_longest", "total_color"});
-    vector<string> nondefault_cmds({"all_beacons", "remove_beacon", "find_beacons"});
+    vector<string> optional_cmds({"region_bounding_box", "stops_closest_to", "stops_common_region"});
+    vector<string> nondefault_cmds({"remove_stop", "find_stops"});
 
     string commandstr = *begin++;
     unsigned int timeout = convert_string_to<unsigned int>(*begin++);
