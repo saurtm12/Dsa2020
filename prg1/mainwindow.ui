@@ -80,7 +80,7 @@
              <string>Regions</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -105,7 +105,7 @@
             <item>
              <widget class="QCheckBox" name="regionnames_checkbox">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="text">
                <string>Region names</string>

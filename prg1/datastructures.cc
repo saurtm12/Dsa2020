@@ -141,10 +141,10 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
     return false;
 }
 
-std::pair<Coord,Coord> Datastructures::region_bounding_box(RegionID id)
+std::vector<RegionID> Datastructures::stop_regions(StopID id)
 {
     // Replace this comment and the line below with your implementation
-    return {NO_COORD, NO_COORD};
+    return {NO_REGION};
 }
 
 void Datastructures::creation_finished()
@@ -153,10 +153,10 @@ void Datastructures::creation_finished()
     // You don't have to use this method for anything, if you don't need it
 }
 
-std::vector<RegionID> Datastructures::stop_regions(StopID id)
+std::pair<Coord,Coord> Datastructures::region_bounding_box(RegionID id)
 {
     // Replace this comment and the line below with your implementation
-    return {NO_REGION};
+    return {NO_COORD, NO_COORD};
 }
 
 std::vector<StopID> Datastructures::stops_closest_to(StopID id)

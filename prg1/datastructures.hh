@@ -134,7 +134,7 @@ public:
 
     // Estimate of performance:
     // Short rationale for estimate:
-    std::pair<Coord, Coord> region_bounding_box(RegionID id);
+    std::vector<RegionID> stop_regions(StopID id);
 
     // Non-compulsory operations
 
@@ -144,7 +144,7 @@ public:
 
     // Estimate of performance:
     // Short rationale for estimate:
-    std::vector<RegionID> stop_regions(StopID id);
+    std::pair<Coord, Coord> region_bounding_box(RegionID id);
 
     // Estimate of performance:
     // Short rationale for estimate:
