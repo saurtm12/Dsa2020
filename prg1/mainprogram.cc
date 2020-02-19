@@ -477,7 +477,6 @@ void MainProgram::test_remove_stop()
 
 void MainProgram::add_random_stops(unsigned int size, Coord min, Coord max)
 {
-    // !!!!!!
     for (unsigned int i = 0; i < size; ++i)
     {
         auto name = n_to_name(random_stops_added_);
@@ -488,12 +487,22 @@ void MainProgram::add_random_stops(unsigned int size, Coord min, Coord max)
 
         ds_.add_stop(id, name, {x, y});
 
-//        // Add random target beacon whose number is smaller, with 80 % probability
-//        if (random_stops_added_ > 0 && random(0, 100) < 80)
-//        {
-//            BeaconID taxerid = n_to_id(random<decltype(random_stops_added_)>(0, random_stops_added_));
-//            ds_.add_subregion_to_region(id, taxerid);
-//        }
+        // Add a new region for every 10 stops
+        if (random_stops_added_ % 10 == 0)
+        {
+            auto regidname = n_to_strid(random_stops_added_ / 10);
+            ds_.add_region(regidname, regidname);
+            // Add region as subregion for some earlier region
+            if (random_stops_added_/10 > 0)
+            {
+                auto parentid = n_to_strid(random<decltype(random_stops_added_)>(0, random_stops_added_/10));
+                ds_.add_subregion_to_region(regidname, parentid);
+            }
+        }
+
+        // Add stop to a region that has already been created
+        auto regid = n_to_strid(random<decltype(random_stops_added_)>(0, random_stops_added_/10+1));
+        ds_.add_stop_to_region(id, regid);
 
         ++random_stops_added_;
     }
@@ -523,13 +532,13 @@ MainProgram::CmdResult MainProgram::cmd_random_add(std::ostream& output, MatchIt
     }
     else
     {
-        auto beacons = ds_.all_stops();
-        if (!beacons.empty())
+        auto stops = ds_.all_stops();
+        if (!stops.empty())
         {
             // Find out bounding box
             min = {std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
             max = {std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
-            for (auto const& beacon : beacons)
+            for (auto const& beacon : stops)
             {
                 auto [x,y] = ds_.get_stop_coord(beacon);
                 if (x < min.x) { min.x = x; }
@@ -1428,6 +1437,21 @@ string MainProgram::n_to_name(unsigned long n)
     }
 
     return name;
+}
+
+string MainProgram::n_to_strid(unsigned long n)
+{
+ unsigned long int hash = prime1_*n + prime2_;
+ string name = "Reg";
+
+ while (hash > 0)
+ {
+     auto hexnum = hash % 26;
+     hash /= 26;
+     name.push_back('a'+hexnum);
+ }
+
+ return name;
 }
 
 unsigned long int MainProgram::n_to_id(unsigned long int n)

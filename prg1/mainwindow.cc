@@ -298,7 +298,8 @@ void MainWindow::update_view()
                     bboxzvalue = -2;
                 }
                 auto [min, max] = mainprg_.ds_.region_bounding_box(regionid);
-                if (!errors && (min.x == NO_VALUE || min.y == NO_VALUE || max.x == NO_VALUE || max.y == NO_VALUE))
+                if (!errors && !(min == NO_COORD && max == NO_COORD) &&
+                    (min.x == NO_VALUE || min.y == NO_VALUE || max.x == NO_VALUE || max.y == NO_VALUE))
                 {
                     errorout << "GUI error: region_bounding_box(" << regionid << ") returned error {(";
                     if (min == NO_COORD)
