@@ -456,7 +456,7 @@ void MainWindow::number_selected(QString number)
 
 void MainWindow::select_file()
 {
-    QFileDialog dialog(this, "Select file", "", "Command list (*.txt)");
+    QFileDialog dialog(this, "Select file", QDir::currentPath(), "Command list (*.txt)");
     dialog.setFileMode(QFileDialog::ExistingFiles);
     if (dialog.exec())
     {
