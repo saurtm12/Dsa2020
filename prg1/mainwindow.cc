@@ -81,8 +81,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->number_select, static_cast<void(QComboBox::*)(QString const&)>(&QComboBox::activated), this, &MainWindow::number_selected);
 
     // Output box
-    QFont monofont("Monospace");
-    monofont.setStyleHint(QFont::Monospace);
+    QFont monofont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    monofont.setStyleHint(QFont::TypeWriter);
     ui->output->setFont(monofont);
 
     // Initialize graphics scene & view
