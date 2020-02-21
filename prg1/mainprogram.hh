@@ -209,9 +209,13 @@ MainProgram::CmdResult MainProgram::NoParStopCmd(std::ostream& /*output*/, Match
 }
 
 template<std::vector<StopID>(Datastructures::*MFUNC)()>
-MainProgram::CmdResult MainProgram::NoParStopListCmd(std::ostream& /*output*/, MatchIter /*begin*/, MatchIter /*end*/)
+MainProgram::CmdResult MainProgram::NoParStopListCmd(std::ostream& output, MatchIter /*begin*/, MatchIter /*end*/)
 {
     auto result = (ds_.*MFUNC)();
+    if (result.empty())
+    {
+        output << "No stops!" << std::endl;
+    }
     return {ResultType::STOPIDLIST, MainProgram::CmdResultStopIDs{NO_REGION, result}};
 }
 
