@@ -62,7 +62,7 @@ private:
     void init_primes();
     std::string n_to_name(unsigned long int n);
     std::string n_to_strid(unsigned long int n);
-    unsigned long int n_to_id(unsigned long int n);
+    StopID n_to_id(unsigned long int n);
 
 
     enum class StopwatchMode { OFF, ON, NEXT };

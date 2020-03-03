@@ -141,7 +141,7 @@ MainProgram::CmdResult MainProgram::cmd_add_stop(std::ostream& /*output*/, Match
     string ystr = *begin++;
     assert( begin == end && "Impossible number of parameters!");
 
-    StopID id = convert_string_to<int>(idstr);
+    StopID id = convert_string_to<StopID>(idstr);
     Coord xy = {convert_string_to<int>(xstr), convert_string_to<int>(ystr)};
 
     bool success = ds_.add_stop(id, name, xy);
@@ -155,7 +155,7 @@ MainProgram::CmdResult MainProgram::cmd_stop_name(std::ostream &output, MainProg
     string stopidstr = *begin++;
     assert( begin == end && "Impossible number of parameters!");
 
-    StopID stopid = convert_string_to<int>(stopidstr);
+    StopID stopid = convert_string_to<StopID>(stopidstr);
 
     auto result = ds_.get_stop_name(stopid);
     if (result == NO_NAME)
@@ -174,7 +174,7 @@ MainProgram::CmdResult MainProgram::cmd_stop_coord(std::ostream &output, MainPro
     string stopidstr = *begin++;
     assert( begin == end && "Impossible number of parameters!");
 
-    StopID stopid = convert_string_to<int>(stopidstr);
+    StopID stopid = convert_string_to<StopID>(stopidstr);
 
     auto result = ds_.get_stop_coord(stopid);
     if (result == NO_COORD)
@@ -245,7 +245,7 @@ MainProgram::CmdResult MainProgram::cmd_change_stop_name(std::ostream& /*output*
     string newname = *begin++;
     assert( begin == end && "Impossible number of parameters!");
 
-    StopID id = convert_string_to<int>(idstr);
+    StopID id = convert_string_to<StopID>(idstr);
 
     bool success = ds_.change_stop_name(id, newname);
 
@@ -272,7 +272,7 @@ MainProgram::CmdResult MainProgram::cmd_change_stop_coord(std::ostream& /*output
 
     assert( begin == end && "Impossible number of parameters!");
 
-    StopID id = convert_string_to<int>(idstr);
+    StopID id = convert_string_to<StopID>(idstr);
     int x = convert_string_to<int>(xstr);
     int y = convert_string_to<int>(ystr);
 
@@ -300,7 +300,7 @@ MainProgram::CmdResult MainProgram::cmd_add_stop_to_region(std::ostream& output,
     string regionidstr = *begin++;
     assert( begin == end && "Impossible number of parameters!");
 
-    StopID stopid = convert_string_to<int>(stopidstr);
+    StopID stopid = convert_string_to<StopID>(stopidstr);
     RegionID regionid = regionidstr;
 
     view_dirty = true;
@@ -351,7 +351,7 @@ MainProgram::CmdResult MainProgram::cmd_stop_regions(std::ostream& output, MainP
     string stopidstr = *begin++;
     assert( begin == end && "Impossible number of parameters!");
 
-    StopID stopid = convert_string_to<int>(stopidstr);
+    StopID stopid = convert_string_to<StopID>(stopidstr);
 
     output << "Regions for stop ";
     print_stop(stopid, output);
@@ -376,7 +376,7 @@ MainProgram::CmdResult MainProgram::cmd_stops_closest_to(std::ostream& /*output*
   string stopidstr = *begin++;
   assert( begin == end && "Impossible number of parameters!");
 
-  StopID stopid = convert_string_to<int>(stopidstr);
+  StopID stopid = convert_string_to<StopID>(stopidstr);
 
   auto result = ds_.stops_closest_to(stopid);
   return {ResultType::STOPIDLIST, CmdResultStopIDs{NO_REGION, result}};
@@ -426,8 +426,8 @@ MainProgram::CmdResult MainProgram::cmd_stops_common_region(std::ostream &output
     string stopid2str = *begin++;
     assert( begin == end && "Impossible number of parameters!");
 
-    StopID stopid1 = convert_string_to<int>(stopid1str);
-    StopID stopid2 = convert_string_to<int>(stopid2str);
+    StopID stopid1 = convert_string_to<StopID>(stopid1str);
+    StopID stopid2 = convert_string_to<StopID>(stopid2str);
 
     auto result = ds_.stops_common_region(stopid1, stopid2);
     if (result == NO_REGION)
@@ -1458,11 +1458,11 @@ string MainProgram::n_to_strid(unsigned long n)
  return name;
 }
 
-unsigned long int MainProgram::n_to_id(unsigned long int n)
+StopID MainProgram::n_to_id(unsigned long int n)
 {
     unsigned long int hash = prime2_*n + prime1_;
 
-    return hash;
+    return hash % static_cast<unsigned long int>(std::numeric_limits<StopID>::max());
 }
 
 void MainProgram::init_regexs()
