@@ -1109,6 +1109,7 @@ MainProgram::CmdResult MainProgram::cmd_perftest(std::ostream& output, MatchIter
             break;
         }
 
+        ds_.creation_finished();
         for (unsigned int repeat = 0; repeat < repeat_count; ++repeat)
         {
             auto cmdpos = random(testfuncs.begin(), testfuncs.end());
