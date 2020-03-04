@@ -945,7 +945,7 @@ vector<MainProgram::CmdInfo> MainProgram::cmds_ =
     {"stops_common_region", "ID1 ID2", "([0-9]+)[[:space:]]+([0-9]+)", &MainProgram::cmd_stops_common_region, &MainProgram::test_stops_common_region },
     {"remove_stop", "ID", "([0-9]+)", &MainProgram::cmd_remove_stop, &MainProgram::test_remove_stop },
     {"find_stops", "name", "([a-zA-Z0-9 ]+)", &MainProgram::cmd_find_stops, &MainProgram::test_find_stops },
-    {"change_stop_name", "ID newname", "([0-9]+)[[:space:]]+([a-zA-Z ]+)", &MainProgram::cmd_change_stop_name, &MainProgram::test_change_stop_name },
+    {"change_stop_name", "ID newname", "([0-9]+)[[:space:]]+([a-zA-Z0-9 ]+)", &MainProgram::cmd_change_stop_name, &MainProgram::test_change_stop_name },
     {"change_stop_coord", "ID (x,y)", "([0-9]+)[[:space:]]+\\([[:space:]]*([0-9]+)[[:space:]]*,[[:space:]]*([0-9]+)[[:space:]]*\\)",
      &MainProgram::cmd_change_stop_coord, &MainProgram::test_change_stop_coord },
     {"add_stop_to_region", "StopID RegionID",
