@@ -122,17 +122,6 @@ using std::back_inserter;
 
 string const MainProgram::PROMPT = "> ";
 
-void MainProgram::test_get_functions(StopID id)
-{
-    ds_.get_stop_name(id);
-    ds_.get_stop_coord(id);
-    if (random_stops_added_ > 0)
-    {
-        auto regid = n_to_strid(random<decltype(random_stops_added_)>(0, (random_stops_added_-1)/10+1));
-        ds_.get_region_name(regid);
-    }
-}
-
 MainProgram::CmdResult MainProgram::cmd_add_stop(std::ostream& /*output*/, MatchIter begin, MatchIter end)
 {
     string idstr = *begin++;
@@ -169,6 +158,15 @@ MainProgram::CmdResult MainProgram::cmd_stop_name(std::ostream &output, MainProg
     }
 }
 
+void MainProgram::test_stop_name()
+{
+    if (random_stops_added_ > 0) // Don't do anything if there's no beacons
+    {
+        StopID id = random<decltype(random_stops_added_)>(0, random_stops_added_);
+        ds_.get_stop_name(id);
+    }
+}
+
 MainProgram::CmdResult MainProgram::cmd_stop_coord(std::ostream &output, MainProgram::MatchIter begin, MainProgram::MatchIter end)
 {
     string stopidstr = *begin++;
@@ -187,6 +185,15 @@ MainProgram::CmdResult MainProgram::cmd_stop_coord(std::ostream &output, MainPro
         print_coord(result, output);
         output << endl;
         return {ResultType::STOPIDLIST, MainProgram::CmdResultStopIDs{NO_REGION, {stopid}}};
+    }
+}
+
+void MainProgram::test_stop_coord()
+{
+    if (random_stops_added_ > 0) // Don't do anything if there's no beacons
+    {
+        StopID id = random<decltype(random_stops_added_)>(0, random_stops_added_);
+        ds_.get_stop_coord(id);
     }
 }
 
@@ -231,6 +238,15 @@ MainProgram::CmdResult MainProgram::cmd_region_name(std::ostream &output, MainPr
     }
 }
 
+void MainProgram::test_region_name()
+{
+    if (random_stops_added_ > 0)
+    {
+        auto regid = n_to_strid(random<decltype(random_stops_added_)>(0, (random_stops_added_-1)/10+1));
+        ds_.get_region_name(regid);
+    }
+}
+
 MainProgram::CmdResult MainProgram::cmd_creation_finished(std::ostream& output, MainProgram::MatchIter /*begin*/, MainProgram::MatchIter /*end*/)
 {
     ds_.creation_finished();
@@ -260,7 +276,6 @@ void MainProgram::test_change_stop_name()
       StopID id = random<decltype(random_stops_added_)>(0, random_stops_added_);
       auto newname = n_to_name(random<decltype(random_stops_added_)>(0, random_stops_added_));
       ds_.change_stop_name(id, newname);
-      test_get_functions(id);
   }
 }
 
@@ -290,7 +305,6 @@ void MainProgram::test_change_stop_coord()
         auto x = random(0, 1000);
         auto y = random(0, 1000);
         ds_.change_stop_coord(id, {x, y});
-        test_get_functions(id);
     }
 }
 
@@ -367,7 +381,6 @@ void MainProgram::test_stop_regions()
     {
         auto id = n_to_id(random<decltype(random_stops_added_)>(0, random_stops_added_));
         ds_.stop_regions(id);
-        test_get_functions(id);
     }
 }
 
@@ -388,7 +401,6 @@ void MainProgram::test_stops_closest_to()
     {
         auto id = n_to_id(random<decltype(random_stops_added_)>(0, random_stops_added_));
         ds_.stop_regions(id);
-        test_get_functions(id);
     }
 }
 
@@ -444,7 +456,6 @@ void MainProgram::test_stops_common_region()
         auto id1 = n_to_id(random<decltype(random_stops_added_)>(0, random_stops_added_));
         auto id2 = n_to_id(random<decltype(random_stops_added_)>(0, random_stops_added_));
         ds_.stops_common_region(id1, id2);
-        test_get_functions(id1);
     }
 }
 
@@ -928,12 +939,12 @@ vector<MainProgram::CmdInfo> MainProgram::cmds_ =
      "([0-9]+)(?:[[:space:]]+\\([[:space:]]*([0-9]+)[[:space:]]*,[[:space:]]*([0-9]+)[[:space:]]*\\)[[:space:]]+\\([[:space:]]*([0-9]+)[[:space:]]*,[[:space:]]*([0-9]+)[[:space:]]*\\))?",
      &MainProgram::cmd_random_add, &MainProgram::test_random_add_stops },
     {"all_stops", "", "", &MainProgram::cmd_all_stops, nullptr },
-    {"stop_name", "ID", "([0-9]+)", &MainProgram::cmd_stop_name, nullptr },
-    {"stop_coord", "ID", "([0-9]+)", &MainProgram::cmd_stop_coord, nullptr },
+    {"stop_name", "ID", "([0-9]+)", &MainProgram::cmd_stop_name, &MainProgram::test_stop_name },
+    {"stop_coord", "ID", "([0-9]+)", &MainProgram::cmd_stop_coord, &MainProgram::test_stop_coord },
     {"add_region", "ID Name",
      "([a-zA-Z0-9]+)[[:space:]]+([a-zA-Z0-9 -]+)", &MainProgram::cmd_add_region, nullptr },
     {"all_regions", "", "", &MainProgram::cmd_all_regions, nullptr },
-    {"region_name", "RegionID", "([a-zA-Z0-9]+)", &MainProgram::cmd_region_name, nullptr },
+    {"region_name", "RegionID", "([a-zA-Z0-9]+)", &MainProgram::cmd_region_name, &MainProgram::test_region_name },
     {"creation_finished", "", "", &MainProgram::cmd_creation_finished, nullptr },
     {"stop_count", "", "", &MainProgram::cmd_stop_count, nullptr },
     {"clear_all", "", "", &MainProgram::cmd_clear_all, nullptr },

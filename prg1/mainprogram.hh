@@ -127,15 +127,17 @@ private:
     CmdResult cmd_comment(std::ostream& output, MatchIter begin, MatchIter end);
 
     void test_random_add_stops();
+    void test_stop_name();
+    void test_stop_coord();
     void test_find_stops();
     void test_change_stop_name();
     void test_change_stop_coord();
+    void test_region_name();
     void test_stop_regions();
     void test_stops_closest_to();
     void test_remove_stop();
     void test_region_bounding_box();
     void test_stops_common_region();
-    void test_get_functions(StopID id);
 
     void add_random_stops(unsigned int size, Coord min = {1,1}, Coord max = {10000, 10000});
     std::string print_stop(StopID id, std::ostream& output);
