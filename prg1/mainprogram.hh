@@ -126,7 +126,7 @@ private:
     CmdResult cmd_perftest(std::ostream& output, MatchIter begin, MatchIter end);
     CmdResult cmd_comment(std::ostream& output, MatchIter begin, MatchIter end);
 
-    void test_random_add_stops();
+    void test_random_add();
     void test_stop_name();
     void test_stop_coord();
     void test_find_stops();
@@ -139,7 +139,7 @@ private:
     void test_region_bounding_box();
     void test_stops_common_region();
 
-    void add_random_stops(unsigned int size, Coord min = {1,1}, Coord max = {10000, 10000});
+    void add_random_stops_regions(unsigned int size, Coord min = {1,1}, Coord max = {10000, 10000});
     std::string print_stop(StopID id, std::ostream& output);
     std::string print_stop_name(StopID id, std::ostream& output);
     std::string print_region(RegionID id, std::ostream& output);
