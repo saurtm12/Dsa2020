@@ -9,6 +9,7 @@
 #include <limits>
 #include <memory>
 #include <algorithm>
+#include <cmath>
 #include <unordered_map>
 // Types for IDs
 using StopID = long int;
@@ -35,12 +36,16 @@ struct Coord
 // Example: Defining == and hash function for Coord so that it can be used
 // as key for std::unordered_map/set, if needed
 inline bool operator==(Coord c1, Coord c2) { return c1.x == c2.x && c1.y == c2.y; }
-inline bool operator!=(Coord c1, Coord c2) { return !(c1==c2); } // Not strictly necessary
+inline bool operator!=(Coord c1, Coord c2) { return !(c1 == c2); } // Not strictly necessary
 
 // Example: Defining < for Coord so that it can be used
 // as key for std::map/set
 inline bool operator<(Coord c1, Coord c2)
 {
+    if (pow(c1.x,2) + pow(c1.y,2) < pow(c2.x,2) + pow(c2.y,2))
+        {return true;}
+    else if (pow(c1.x,2) + pow(c1.y,2) > pow(c2.x,2) + pow(c2.y,2))
+        {return false;}
     if (c1.y < c2.y) { return true; }
     else if (c2.y < c1.y) { return false; }
     else { return c1.x < c2.x; }
@@ -163,11 +168,12 @@ public:
 private:
     struct Point{
         StopID id;
-        RegionID r_id;
         Name name;
         Coord coord;
+        RegionID r_id;
         std::shared_ptr < Point > left;
         std::shared_ptr < Point > right;
+
         Point(StopID id_,Name name_,Coord coord_, std::shared_ptr < Point > left_, std::shared_ptr < Point > right_)
         {
             id = id_;
@@ -175,14 +181,15 @@ private:
             coord = coord_;
             left = left_;
             right = right_;
-        }
+        }  
     };
     using Point_ptr =  std::shared_ptr <Point>;
     bool is_heap;
-    std::unordered_map < StopID, std::shared_ptr <Point> > map;
-    std::vector <std::shared_ptr <Point> > vector;
-    std::shared_ptr < Point > root;
-    // Add stuff needed for your class implementation here
+    std::unordered_map < StopID,Point_ptr > mp;
+    std::vector <Point_ptr> vec;
+    Point_ptr root;
+    Point_ptr coord_min;
+    Point_ptr coord_max;
 
 };
 
