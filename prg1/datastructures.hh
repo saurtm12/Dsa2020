@@ -7,7 +7,9 @@
 #include <vector>
 #include <utility>
 #include <limits>
-
+#include <memory>
+#include <algorithm>
+#include <unordered_map>
 // Types for IDs
 using StopID = long int;
 using RegionID = std::string;
@@ -159,6 +161,27 @@ public:
     RegionID stops_common_region(StopID id1, StopID id2);
 
 private:
+    struct Point{
+        StopID id;
+        RegionID r_id;
+        Name name;
+        Coord coord;
+        std::shared_ptr < Point > left;
+        std::shared_ptr < Point > right;
+        Point(StopID id_,Name name_,Coord coord_, std::shared_ptr < Point > left_, std::shared_ptr < Point > right_)
+        {
+            id = id_;
+            name = name_;
+            coord = coord_;
+            left = left_;
+            right = right_;
+        }
+    };
+    using Point_ptr =  std::shared_ptr <Point>;
+    bool is_heap;
+    std::unordered_map < StopID, std::shared_ptr <Point> > map;
+    std::vector <std::shared_ptr <Point> > vector;
+    std::shared_ptr < Point > root;
     // Add stuff needed for your class implementation here
 
 };

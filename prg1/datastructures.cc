@@ -5,9 +5,8 @@
 #include <random>
 #include <cmath>
 #include <stdexcept>
-
+#include <algorithm>
 std::minstd_rand rand_engine; // Reasonably quick pseudo-random generator
-
 template <typename Type>
 Type random_in_range(Type start, Type end)
 {
@@ -26,53 +25,85 @@ Type random_in_range(Type start, Type end)
 
 Datastructures::Datastructures()
 {
+    //A
     // Replace this comment with your implementation
 }
 
 Datastructures::~Datastructures()
 {
-    // Replace this comment with your implementation
+    root = nullptr;
 }
 
 int Datastructures::stop_count()
 {
-    // Replace this comment and the line below with your implementation
-    return NO_VALUE;
+    return map.size();
+
 }
 
 void Datastructures::clear_all()
 {
-    // Replace this comment with your implementation
+    map.clear();
+    root = nullptr;
 }
 
 std::vector<StopID> Datastructures::all_stops()
 {
     // Replace this comment and the line below with your implementation
-    return {NO_STOP};
+    std::vector <StopID> temp_vector;
+    for (auto point : vector)
+    {
+        temp_vector.push_back(point->id);
+    }
+    return temp_vector;
 }
 
 bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
 {
-    // Replace this comment and the line below with your implementation
-    return false;
+    auto iter = map.find(id);
+    if (iter != map.end())
+    {
+        return false;
+    }
+    std::shared_ptr <Point> new_point = std::make_shared<Point>(id, name,xy,nullptr,nullptr);
+    vector.push_back(new_point);
+    map.insert({id,new_point});
+    return true;
 }
 
 Name Datastructures::get_stop_name(StopID id)
 {
-    // Replace this comment and the line below with your implementation
-    return NO_NAME;
+    auto iter = map.find(id);
+    if (iter == map.end())
+    {
+        return NO_NAME;
+    }
+    return iter->second->name;
 }
 
 Coord Datastructures::get_stop_coord(StopID id)
 {
-    // Replace this comment and the line below with your implementation
-    return NO_COORD;
+    auto iter = map.find(id);
+    if (iter == map.end())
+    {
+        return NO_COORD;
+    }
+    return iter->second->coord;
 }
 
 std::vector<StopID> Datastructures::stops_alphabetically()
 {
+    std::sort(vector.begin(), vector.end(), [](const Point_ptr& point_a,const Point_ptr& point_b)
+                                                {
+                                                      return point_a->name < point_b->name;
+
+                                                }   );
+    std::vector <StopID> temp_vector;
+    for (auto point : vector)
+    {
+        temp_vector.push_back(point->id);
+    }
     // Replace this comment and the line below with your implementation
-    return {NO_STOP};
+    return temp_vector;
 }
 
 std::vector<StopID> Datastructures::stops_coord_order()
