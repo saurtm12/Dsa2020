@@ -67,7 +67,7 @@ bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
     {
         return false;
     }
-    std::shared_ptr <Point> new_point = std::make_shared<Point>(id, name,xy,nullptr,nullptr);
+    std::shared_ptr <Point> new_point = std::make_shared<Point>(id, name,xy);
     vec.push_back(new_point);
     mp.insert({id,new_point});
     if (mp.size() == 1)
@@ -140,14 +140,11 @@ std::vector<StopID> Datastructures::stops_coord_order()
 StopID Datastructures::min_coord()
 {
 
-    // Replace this comment and the line below with your implementation
-
     return coord_min->id;
 }
 
 StopID Datastructures::max_coord()
 {
-    // Replace this comment and the line below with your implementation
     return coord_max->id;
 }
 
@@ -186,37 +183,86 @@ bool Datastructures::change_stop_coord(StopID id, Coord newcoord)
 
 bool Datastructures::add_region(RegionID id, const Name &name)
 {
-    // Replace this comment and the line below with your implementation
+    auto iter = region_map.find(id);
+    if (iter == region_map.end())
+    {
+        std::shared_ptr <Region> new_region = std::make_shared<Region>(id, name);
+        return true;
+    }
+
     return false;
 }
 
 Name Datastructures::get_region_name(RegionID id)
 {
-    // Replace this comment and the line below with your implementation
+    auto iter = region_map.find(id);
+    if (iter != region_map.end())
+    {
+        return iter->second->name;
+    }
     return NO_NAME;
 }
 
 std::vector<RegionID> Datastructures::all_regions()
 {
-    // Replace this comment and the line below with your implementation
+    std::vector<RegionID> regions;
+    for (auto region : region_map)
+    {
+        regions.push_back(region.first);
+    }
+    return regions;
     return {NO_REGION};
 }
 
 bool Datastructures::add_stop_to_region(StopID id, RegionID parentid)
 {
-    // Replace this comment and the line below with your implementation
+    auto region_iter = region_map.find(parentid);
+    if (region_iter != region_map.end())
+    {
+        auto stop_iter = mp.find(id);
+        if (stop_iter != mp.end())
+        {
+            stop_iter->second->r_id = parentid;
+            region_iter->second->subpoints.insert({id,stop_iter->second});
+            return true;
+        }
+    }
     return false;
 }
 
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
-    // Replace this comment and the line below with your implementation
+    auto iter = region_map.find(id);
+    if (iter != region_map.end())
+    {
+        auto parent_iter = region_map.find(parentid);
+        if (parent_iter != region_map.end())
+        {
+            iter->second->subregion.insert({id,region_map.at(id)});
+            region_map.at(id)->parent_region = region_map.at(parentid);
+            return true;
+        }
+    }
     return false;
 }
 
 std::vector<RegionID> Datastructures::stop_regions(StopID id)
 {
-    // Replace this comment and the line below with your implementation
+    auto iter = mp.find(id);
+    if (iter != mp.end())
+    {
+        std::vector<RegionID> temp;
+        Region_ptr region = region_map.at(iter->second->r_id);
+        while(region != nullptr)
+        {
+            temp.push_back(region->id);
+            region= region->parent_region;
+        }
+        if (temp.size() != 0 )
+        {
+            return temp;
+        }
+    }
     return {NO_REGION};
 }
 
@@ -228,7 +274,7 @@ void Datastructures::creation_finished()
 
 std::pair<Coord,Coord> Datastructures::region_bounding_box(RegionID id)
 {
-    // Replace this comment and the line below with your implementation
+
     return {NO_COORD, NO_COORD};
 }
 
@@ -240,12 +286,12 @@ std::vector<StopID> Datastructures::stops_closest_to(StopID id)
 
 bool Datastructures::remove_stop(StopID id)
 {
-    // Replace this comment and the line below with your implementation
+
     return false;
 }
 
 RegionID Datastructures::stops_common_region(StopID id1, StopID id2)
 {
-    // Replace this comment and the line below with your implementation
+
     return NO_REGION;
 }
