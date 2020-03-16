@@ -1,5 +1,5 @@
 read "example-compulsory-in.txt"
-add_stop 7 Seven (10,10)
+add_stop 7 Seven (11,10)
 stops_closest_to 4
 region_bounding_box S
 region_bounding_box L

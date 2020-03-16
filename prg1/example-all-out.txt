@@ -98,11 +98,11 @@ Stops in region Large (and subregions) are within (0,1)-(7,9)
 Large: id=L
 > quit
 ** End of commands from 'example-compulsory-in.txt'
-> add_stop 7 Seven (10,10)
-Seven: pos=(10,10), id=7
+> add_stop 7 Seven (11,10)
+Seven: pos=(11,10), id=7
 > stops_closest_to 4
 1. Two: pos=(4,4), id=5
-2. Seven: pos=(10,10), id=7
+2. Seven: pos=(11,10), id=7
 3. Two: pos=(6,2), id=2
 4. Six: pos=(2,9), id=6
 5. Three: pos=(0,6), id=3
@@ -117,12 +117,12 @@ Region: New: id=N
 > add_stop_to_region 7 N
 Added stop Seven to region New
 Region: New: id=N
-Seven: pos=(10,10), id=7
+Seven: pos=(11,10), id=7
 > stop_regions 7
-Regions for stop Seven: pos=(10,10), id=7
+Regions for stop Seven: pos=(11,10), id=7
 New: id=N
 > region_bounding_box N
-Stops in region New (and subregions) are within (10,10)-(10,10)
+Stops in region New (and subregions) are within (11,10)-(11,10)
 New: id=N
 > stops_common_region 1 2
 Region: Small: id=S
@@ -135,24 +135,24 @@ Region: Large: id=L
 > stops_common_region 5 7
 No common region found!
 1. Two: pos=(4,4), id=5
-2. Seven: pos=(10,10), id=7
+2. Seven: pos=(11,10), id=7
 > add_subregion_to_region N S
 Added subregion New to region Small
 > stop_regions 7
-Regions for stop Seven: pos=(10,10), id=7
+Regions for stop Seven: pos=(11,10), id=7
 1. New: id=N
 2. Small: id=S
 3. Large: id=L
 > region_bounding_box S
-Stops in region Small (and subregions) are within (0,1)-(10,10)
+Stops in region Small (and subregions) are within (0,1)-(11,10)
 Small: id=S
 > region_bounding_box L
-Stops in region Large (and subregions) are within (0,1)-(10,10)
+Stops in region Large (and subregions) are within (0,1)-(11,10)
 Large: id=L
 > min_coord
 One: pos=(1,1), id=1
 > max_coord
-Seven: pos=(10,10), id=7
+Seven: pos=(11,10), id=7
 > remove_stop 7
 Stop Seven removed.
 > min_coord
