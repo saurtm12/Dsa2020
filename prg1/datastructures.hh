@@ -171,8 +171,6 @@ private:
         Name name;
         Coord coord;
         RegionID r_id = NO_REGION;
-        std::shared_ptr < Point > left = nullptr;
-        std::shared_ptr < Point > right = nullptr;
 
         Point(StopID id_,Name name_,Coord coord_)
         {
@@ -183,29 +181,27 @@ private:
         }  
     };
     using Point_ptr =  std::shared_ptr <Point>;
-    bool is_heap;
+
     std::unordered_map < StopID,Point_ptr > mp;
-    std::vector <Point_ptr> vec;
-    Point_ptr root;
-    Point_ptr coord_min;
-    Point_ptr coord_max;
+    Point_ptr coord_min = nullptr;
+    Point_ptr coord_max = nullptr;
 
     struct Region{
         RegionID id;
         Name name;
         std::unordered_map <StopID,Point_ptr> subpoints;
-        std::unordered_map <RegionID,std::shared_ptr<Region>> subregion;
+        std::unordered_map <RegionID,std::shared_ptr<Region>> subregions;
         std::shared_ptr<Region> parent_region =nullptr;
+
         Region(RegionID id_, Name name_)
         {
             id = id_;
             name = name_;
         }
-
     };
     using Region_ptr = std::shared_ptr<Region>;
     std::unordered_map <RegionID, Region_ptr> region_map;
-
+    std::pair<Coord,Coord> recursive_region_bounding_box(Region_ptr region);
 };
 
 #endif // DATASTRUCTURES_HH
