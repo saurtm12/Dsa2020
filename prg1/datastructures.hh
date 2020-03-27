@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
+#include <map>
 // Types for IDs
 using StopID = long int;
 using RegionID = std::string;
@@ -32,6 +33,7 @@ struct Coord
     int x = NO_VALUE;
     int y = NO_VALUE;
 };
+double square_distance(Coord c1, Coord c2);
 
 // Example: Defining == and hash function for Coord so that it can be used
 // as key for std::unordered_map/set, if needed
@@ -42,9 +44,9 @@ inline bool operator!=(Coord c1, Coord c2) { return !(c1 == c2); } // Not strict
 // as key for std::map/set
 inline bool operator<(Coord c1, Coord c2)
 {
-    if (pow(c1.x,2) + pow(c1.y,2) < pow(c2.x,2) + pow(c2.y,2))
+    if (c1.x*c1.x + c1.y*c1.y < c2.x*c2.x + c2.y*c2.y)
         {return true;}
-    else if (pow(c1.x,2) + pow(c1.y,2) > pow(c2.x,2) + pow(c2.y,2))
+    else if (c1.x*c1.x + c1.y*c1.y > c2.x*c2.x + c2.y*c2.y)
         {return false;}
     if (c1.y < c2.y) { return true; }
     else if (c2.y < c1.y) { return false; }
@@ -166,23 +168,28 @@ public:
     RegionID stops_common_region(StopID id1, StopID id2);
 
 private:
+    using V_ptr = std::shared_ptr<std::pair<StopID,Coord>>;
     struct Point{
         StopID id;
         Name name;
         Coord coord;
         RegionID r_id = NO_REGION;
-
-        Point(StopID id_,Name name_,Coord coord_)
+        V_ptr ptr_v;
+        Point(const StopID& id_,const Name& name_,const Coord& coord_,
+        const V_ptr ptr_v_)
         {
             id = id_;
             name = name_;
             coord = coord_;
-
-        }  
+            ptr_v = ptr_v_;
+        }
     };
     using Point_ptr =  std::shared_ptr <Point>;
 
+    std::multimap <Name, Point_ptr > namemap;
     std::unordered_map < StopID,Point_ptr > mp;
+    std::vector<V_ptr>  id_to_coordinate;
+    bool vector_is_sorted = false;
     Point_ptr coord_min = nullptr;
     Point_ptr coord_max = nullptr;
 
