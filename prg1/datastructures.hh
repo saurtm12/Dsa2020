@@ -12,6 +12,7 @@
 #include <cmath>
 #include <unordered_map>
 #include <map>
+#include <unordered_set>
 // Types for IDs
 using StopID = long int;
 using RegionID = std::string;

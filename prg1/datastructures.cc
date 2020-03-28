@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <algorithm>
 
-#include<iostream>
+#include <unordered_set>
 std::minstd_rand rand_engine; // Reasonably quick pseudo-random generator
 template <typename Type>
 Type random_in_range(Type start, Type end)
@@ -441,12 +441,12 @@ bool Datastructures::remove_stop(StopID id)
         return false;
     auto pair = namemap.equal_range(iter->second->name);
     auto name_iter = pair.first;
-
     for (auto iter = pair.first;iter != pair.second;iter++)
         {
             if (iter->second->id == id)
             {
                 name_iter = iter;
+                break;
             }
         }
 
@@ -461,19 +461,21 @@ bool Datastructures::remove_stop(StopID id)
         vector_is_sorted = false;
         return true;
     }
+
     if (coord_max->id == id)
     {
+       
         if (vector_is_sorted)
             coord_max = mp.at(id_to_coordinate[id_to_coordinate.size()-2]->first);
         else
         {
             mp.at(id_to_coordinate[id_to_coordinate.size()-1]->first)->ptr_v = iter->second->ptr_v;
-            std::swap(iter->second->ptr_v->second,id_to_coordinate[id_to_coordinate.size()-1]->second);
-            std::swap(iter->second->ptr_v->first,id_to_coordinate[id_to_coordinate.size()-1]->first);
-            iter->second->ptr_v = id_to_coordinate[id_to_coordinate.size()-1];
-            auto max = std::max(id_to_coordinate.begin(),id_to_coordinate.end()-2,[&](auto ptr1, auto ptr2)
+            iter->second->ptr_v->first = id_to_coordinate[id_to_coordinate.size()-1]->first;
+            iter->second->ptr_v->second = id_to_coordinate[id_to_coordinate.size()-1]->second;
+
+            auto max = std::max_element(id_to_coordinate.begin(),id_to_coordinate.end()-2,[&](auto ptr1, auto ptr2)->bool
             {
-                return (*ptr1)->second<(*ptr2)->second;
+                return ptr1->second<ptr2->second;
             });
             coord_max =  mp.at((*max)->first);
         }
@@ -485,19 +487,19 @@ bool Datastructures::remove_stop(StopID id)
 
      if (coord_min->id == id)
     {
+        mp.at(id_to_coordinate[id_to_coordinate.size()-1]->first)->ptr_v = iter->second->ptr_v;
+        iter->second->ptr_v->first = id_to_coordinate[id_to_coordinate.size()-1]->first;
+        iter->second->ptr_v->second = id_to_coordinate[id_to_coordinate.size()-1]->second;
         if (vector_is_sorted)
             coord_min = mp.at(id_to_coordinate[1]->first);
         else
-        {
-            mp.at(id_to_coordinate[id_to_coordinate.size()-1]->first)->ptr_v = iter->second->ptr_v;
-            std::swap(iter->second->ptr_v->second,id_to_coordinate[id_to_coordinate.size()-1]->second);
-            std::swap(iter->second->ptr_v->first,id_to_coordinate[id_to_coordinate.size()-1]->first);
-            iter->second->ptr_v = id_to_coordinate[id_to_coordinate.size()-1];
-            auto min = std::min(id_to_coordinate.begin(),id_to_coordinate.end()-2,[&](auto ptr1,auto ptr2)
+        {    
+            auto min = std::min_element(id_to_coordinate.begin(),id_to_coordinate.end()-2,[&](auto ptr1,auto ptr2) ->bool
             {
-                return (*ptr1)->second< (*ptr2)->second;
+                return ptr1->second< ptr2->second;
             });
             coord_min =  mp.at((*min)->first);
+
         }
         mp.erase(iter);
         namemap.erase(name_iter);
@@ -520,8 +522,34 @@ bool Datastructures::remove_stop(StopID id)
 
 RegionID Datastructures::stops_common_region(StopID id1, StopID id2)
 {
-
+    auto iter1 = mp.find(id1);
+    auto iter2 = mp.find(id2);
+    if (iter1 == mp.end() || iter2 == mp.end())
+        return NO_REGION;
+    if (iter1->second->r_id == NO_REGION ||  iter2->second->r_id == NO_REGION)
+        return NO_REGION;
+    Region_ptr parent1 = region_map.at(iter1->second->r_id),parent2 = region_map.at(iter2->second->r_id);
+    std::unordered_set<RegionID> regions1,regions2;
+    while (parent1 != nullptr || parent2 != nullptr)
+    {   if (parent1 != nullptr)
+            regions1.insert(parent1->id);
+        if (parent2 != nullptr)
+            regions2.insert(parent2->id);
+        if (parent1!= nullptr && regions2.find(parent1->id) != regions2.end())
+        {
+            return parent1->id;
+        }
+        if (parent2 != nullptr && regions1.find(parent2->id) != regions1.end())
+        {
+            return parent2->id;
+        }
+        if (parent1 != nullptr)
+            parent1 = parent1->parent_region;
+        if (parent2 != nullptr)
+            parent2 = parent2->parent_region;
+    }
     return NO_REGION;
+    
 }
 
 double square_distance(Coord c1, Coord c2)
