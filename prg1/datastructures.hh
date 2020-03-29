@@ -58,7 +58,6 @@ inline bool operator<(Coord c1, Coord c2)
 Coord const NO_COORD = {NO_VALUE, NO_VALUE};
 
 
-// This is the class you are supposed to implement
 
 class Datastructures
 {
@@ -66,20 +65,24 @@ public:
     Datastructures();
     ~Datastructures();
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: Theta(1)
+    // Short rationale for estimate: return size vector costs constant time
     int stop_count();
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(m) (m is the number of regions)
+    // Short rationale for estimate: clear the subpoints and the sub regions of
+    // every regions.
     void clear_all();
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: Theta(n)
+    // Short rationale for estimate: Go through elements of a vector costs linear
+    // amount of time with size of vector;
     std::vector<StopID> all_stops();
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(1) before any funtions that related to stops name,
+    // After that O(logn)
+    // Short rationale for estimate: adding element to unordered_map average O(1),
+    // then if the mapname_is_added, then adding costs
     bool add_stop(StopID id, Name const& name, Coord xy);
 
     // Estimate of performance:

@@ -34,7 +34,7 @@ Datastructures::Datastructures()
 Datastructures::~Datastructures()
 {
     mp.clear();
-    for(auto const& region : region_map)
+    for(auto& region : region_map)
     {
         region.second->subpoints.clear();
         region.second->subregions.clear();
@@ -55,7 +55,7 @@ int Datastructures::stop_count()
 void Datastructures::clear_all()
 {
     mp.clear();
-    for(auto const& region : region_map)
+    for(auto& region : region_map)
     {
         region.second->subpoints.clear();
         region.second->subregions.clear();
@@ -86,7 +86,7 @@ name, and coordinates. Initially a stop is not part of
 any region. If there already is a stop with the given id,
 nothing is done and false is returned, otherwise
 true is returned.*/
-//O(log n) (line 84)
+//O(log n) 
 bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
 {
     auto iter = mp.find(id);
@@ -629,9 +629,8 @@ bool Datastructures::remove_stop(StopID id)
     }
 
     mp.at(id_to_coordinate[id_to_coordinate.size()-1]->first)->ptr_v = iter->second->ptr_v;
-    std::swap(iter->second->ptr_v->second,id_to_coordinate[id_to_coordinate.size()-1]->second);
-    std::swap(iter->second->ptr_v->first,id_to_coordinate[id_to_coordinate.size()-1]->first);
-    iter->second->ptr_v = id_to_coordinate[id_to_coordinate.size()-1];
+    iter->second->ptr_v->second = id_to_coordinate[id_to_coordinate.size()-1]->second;
+    iter->second->ptr_v->first=id_to_coordinate[id_to_coordinate.size()-1]->first;
     mp.erase(iter);
     id_to_coordinate.erase(id_to_coordinate.end()-1);
     vector_is_sorted = false;
