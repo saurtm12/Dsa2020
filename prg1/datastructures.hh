@@ -187,10 +187,11 @@ private:
     };
     using Point_ptr =  std::shared_ptr <Point>;
 
-    std::multimap <Name, Point_ptr > namemap;
+    std::multimap <Name, StopID > namemap;
     std::unordered_map < StopID,Point_ptr > mp;
     std::vector<V_ptr>  id_to_coordinate;
     bool vector_is_sorted = false;
+    bool namemap_is_added = false;
     Point_ptr coord_min = nullptr;
     Point_ptr coord_max = nullptr;
 
