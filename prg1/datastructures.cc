@@ -41,12 +41,12 @@ Datastructures::~Datastructures()
     coord_min = nullptr;
     coord_max = nullptr;
 }
-//O(1)
+
 int Datastructures::stop_count()
 {
     return id_to_coordinate.size();
 }
-//O(m) linear with number of regions
+
 void Datastructures::clear_all()
 {
     mp.clear();
@@ -63,7 +63,7 @@ void Datastructures::clear_all()
     coord_max = nullptr;
     coord_min = nullptr;
 }
-//O(n)
+
 std::vector<StopID> Datastructures::all_stops()
 {
     std::vector <StopID> temp_vector;
@@ -74,7 +74,6 @@ std::vector<StopID> Datastructures::all_stops()
     }
     return temp_vector;
 }
-
 
 bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
 {
@@ -199,7 +198,7 @@ StopID Datastructures::max_coord()
 }
 
 /*
-if the map has not been added, then add it by sorting and adding to map.
+if the map has not been added, then add elements to the map.
 */
 std::vector<StopID> Datastructures::find_stops(Name const& name)
 {
@@ -217,9 +216,7 @@ std::vector<StopID> Datastructures::find_stops(Name const& name)
     std::vector<StopID> temp_vector;
     for (auto iter = pair.first;iter != pair.second;iter++)
     {
-
             temp_vector.push_back(iter->second);
-
     }
     return temp_vector;
 }
@@ -295,6 +292,7 @@ bool Datastructures::change_stop_coord(StopID id, Coord newcoord)
     point->second->coord = newcoord;
     return true;
 }
+
 bool Datastructures::add_region(RegionID id, const Name &name)
 {
     auto iter = region_map.find(id);
@@ -304,9 +302,9 @@ bool Datastructures::add_region(RegionID id, const Name &name)
         region_map.insert({id,new_region});
         return true;
     }
-
     return false;
 }
+
 Name Datastructures::get_region_name(RegionID id)
 {
     auto iter = region_map.find(id);
@@ -329,6 +327,7 @@ std::vector<RegionID> Datastructures::all_regions()
     }
     return regions;
 }
+
 bool Datastructures::add_stop_to_region(StopID id, RegionID parentid)
 {
     auto region_iter = region_map.find(parentid);
@@ -360,7 +359,7 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
     }
     return false;
 }
-//Average O(1)
+
 std::vector<RegionID> Datastructures::stop_regions(StopID id)
 {
     auto iter = mp.find(id);
@@ -384,8 +383,6 @@ std::vector<RegionID> Datastructures::stop_regions(StopID id)
 void Datastructures::creation_finished()
 {
 }
-
-//O(n) n is the number of the points belonging to that region
 
 std::pair<Coord,Coord> Datastructures::region_bounding_box(RegionID id)
 {
@@ -423,7 +420,6 @@ std::pair<Coord,Coord> Datastructures::recursive_region_bounding_box(Region_ptr 
             min.y = point.second->coord.y;
             }
    }
-
         if (region->subregions.size() == 0)
           return {min,max};
         for (auto const& subregion : region->subregions)
@@ -448,13 +444,10 @@ std::pair<Coord,Coord> Datastructures::recursive_region_bounding_box(Region_ptr 
                     min.y = sub_box.first.y;
                     }
             }
-
         }
     return {min,max};
   }
 }
-
-
 
 std::vector<StopID> Datastructures::stops_closest_to(StopID id)
 {
