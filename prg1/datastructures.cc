@@ -1,13 +1,12 @@
 // Datastructures.cc
 
 #include "datastructures.hh"
-
 #include <random>
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
-
 #include <unordered_set>
+
 std::minstd_rand rand_engine; // Reasonably quick pseudo-random generator
 template <typename Type>
 Type random_in_range(Type start, Type end)
@@ -20,17 +19,13 @@ Type random_in_range(Type start, Type end)
     return static_cast<Type>(start+num);
 }
 
-// Modify the code below to implement the functionality of the class.
-// Also remove comments from the parameter names when you implement
-// an operation (Commenting out parameter name prevents compiler from
-// warning about unused parameters on operations you haven't yet implemented.)
 const Coord COORD_MAX = {std::numeric_limits<int>::max(),
                          std::numeric_limits<int>::max()};
 Datastructures::Datastructures()
 {
-    // Replace this comment with your implementation
 }
 
+// O(m) linear with nnumber of regions.
 Datastructures::~Datastructures()
 {
     mp.clear();
@@ -51,7 +46,7 @@ int Datastructures::stop_count()
 {
     return id_to_coordinate.size();
 }
-//O(1)
+//O(m) linear with number of regions
 void Datastructures::clear_all()
 {
     mp.clear();
@@ -81,12 +76,6 @@ std::vector<StopID> Datastructures::all_stops()
 }
 
 
-/*Adds a stop to the data structure with given unique id,
-name, and coordinates. Initially a stop is not part of
-any region. If there already is a stop with the given id,
-nothing is done and false is returned, otherwise
-true is returned.*/
-//O(log n) 
 bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
 {
     auto iter = mp.find(id);
@@ -95,7 +84,6 @@ bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
         return false;
     }
     id_to_coordinate.push_back(std::make_shared<std::pair<StopID,Coord>>(id,xy));
-
     std::shared_ptr <Point> new_point = std::make_shared<Point>(id, name,xy,id_to_coordinate[id_to_coordinate.size()-1]);
     mp.insert({id,new_point});
     if (namemap_is_added)
@@ -110,7 +98,6 @@ bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
     }
 
     vector_is_sorted = false;
-
     if (coord_max->coord < new_point->coord)
         {coord_max = new_point;}
     if (new_point->coord < coord_min->coord )
@@ -118,7 +105,7 @@ bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
     new_point = nullptr;
     return true;
 }
-//average O(1)
+
 Name Datastructures::get_stop_name(StopID id)
 {
     auto iter = mp.find(id);
@@ -128,7 +115,7 @@ Name Datastructures::get_stop_name(StopID id)
     }
     return iter->second->name;
 }
-//Average (O(1))
+
 Coord Datastructures::get_stop_coord(StopID id)
 {
     auto iter = mp.find(id);
@@ -138,7 +125,13 @@ Coord Datastructures::get_stop_coord(StopID id)
     }
     return iter->second->coord;
 }
-//O(n) nlogn at the first time and then O(n)
+/*
+if the namemap has not been added, then sort ids by their names (cost nlogn)
+then add them to the map, because it is sorted, then add element
+with hint iterator cost amortized constant time, then add n element
+to map cost linear time.
+Then if the map is constructed, then go through the map cost only n.
+*/
 std::vector<StopID> Datastructures::stops_alphabetically()
 {
     std::vector <StopID> temp_vector;
@@ -151,14 +144,12 @@ std::vector<StopID> Datastructures::stops_alphabetically()
         }
         return temp_vector;
     }
-
     std::vector<Point_ptr> vec;
     vec.reserve(mp.size());
     for(auto const& point : mp)
     {
         vec.push_back(point.second);
     }
-
     std::sort(vec.begin(), vec.end(),
               [](const Point_ptr& point_a,const Point_ptr& point_b) -> bool
                 {
@@ -172,18 +163,16 @@ std::vector<StopID> Datastructures::stops_alphabetically()
         iter++;
     }
     namemap_is_added = true;
-
     for (auto const& point : vec)
     {
         temp_vector.push_back(point->id);
     }
     return temp_vector;
-
-
 }
 
-
-//O(nlogn)
+/*
+sort the vector by stop_coord, then push it to another vector
+*/
 std::vector<StopID> Datastructures::stops_coord_order()
 {
     if (!vector_is_sorted)
@@ -205,7 +194,8 @@ std::vector<StopID> Datastructures::stops_coord_order()
 
     return temp_vector;
 }
-//O(1)
+
+
 StopID Datastructures::min_coord()
 {
 
@@ -213,14 +203,17 @@ StopID Datastructures::min_coord()
         return coord_min->id;
     return NO_STOP;
 }
-//O(1)
+
 StopID Datastructures::max_coord()
 {
     if (mp.size() != 0)
         return coord_max->id;
     return NO_STOP;
 }
-//O(logn)
+
+/*
+if the map has not been added, then add it by sorting and adding to map.
+*/
 std::vector<StopID> Datastructures::find_stops(Name const& name)
 {
     if (!namemap_is_added)
@@ -260,7 +253,7 @@ std::vector<StopID> Datastructures::find_stops(Name const& name)
     }
     return temp_vector;
 }
-//O(logn)
+
 bool Datastructures::change_stop_name(StopID id, const Name& newname)
 {
     auto point = mp.find(id);
@@ -271,7 +264,6 @@ bool Datastructures::change_stop_name(StopID id, const Name& newname)
     if (namemap_is_added)
     {
         auto pair = namemap.equal_range(point->second->name);
-
         for (auto iter = pair.first;iter != pair.second;iter++)
         {
             if (iter->second == id)
@@ -283,12 +275,12 @@ bool Datastructures::change_stop_name(StopID id, const Name& newname)
             }
         }
     }
-
     point->second->name = newname;
     return true;
 
 }
-//O(1) if remove max_coord/min_coord, O(n)
+
+//if change min/max, then we have to find min/max again.
 bool Datastructures::change_stop_coord(StopID id, Coord newcoord)
 {
     auto point = mp.find(id);
@@ -296,11 +288,8 @@ bool Datastructures::change_stop_coord(StopID id, Coord newcoord)
     {
         return false;
     }
-
-
     point->second->ptr_v->second = newcoord;
     vector_is_sorted = false;
-
     if (coord_max->id == id)
     {
        if (newcoord < coord_max->coord)
@@ -309,7 +298,6 @@ bool Datastructures::change_stop_coord(StopID id, Coord newcoord)
                 coord_max = mp.at(id_to_coordinate[id_to_coordinate.size()-2]->first);
             else
             {
-
                 auto max = std::max_element(id_to_coordinate.begin(),id_to_coordinate.end(),[&](auto ptr1, auto ptr2)->bool
             {
                 return ptr1->second<ptr2->second;
@@ -318,7 +306,6 @@ bool Datastructures::change_stop_coord(StopID id, Coord newcoord)
             }
         }
     }
-
     if (coord_min->id == id)
     {
        if (coord_min->coord <  newcoord)
@@ -327,7 +314,6 @@ bool Datastructures::change_stop_coord(StopID id, Coord newcoord)
                 coord_min = mp.at(id_to_coordinate[1]->first);
             else
             {
-
                 auto min = std::min_element(id_to_coordinate.begin(),id_to_coordinate.end(),[&](auto ptr1, auto ptr2)->bool
             {
                 return ptr1->second<ptr2->second;
@@ -337,9 +323,8 @@ bool Datastructures::change_stop_coord(StopID id, Coord newcoord)
         }
     }
     point->second->coord = newcoord;
-        return true;
+    return true;
 }
-//O(1)
 bool Datastructures::add_region(RegionID id, const Name &name)
 {
     auto iter = region_map.find(id);
@@ -352,7 +337,6 @@ bool Datastructures::add_region(RegionID id, const Name &name)
 
     return false;
 }
-//O(1)
 Name Datastructures::get_region_name(RegionID id)
 {
     auto iter = region_map.find(id);
@@ -362,7 +346,6 @@ Name Datastructures::get_region_name(RegionID id)
     }
     return NO_NAME;
 }
-//O(n)
 std::vector<RegionID> Datastructures::all_regions()
 {
     if  (region_map.size() == 0)
@@ -376,7 +359,6 @@ std::vector<RegionID> Datastructures::all_regions()
     }
     return regions;
 }
-//O(1)
 bool Datastructures::add_stop_to_region(StopID id, RegionID parentid)
 {
     auto region_iter = region_map.find(parentid);
@@ -391,9 +373,8 @@ bool Datastructures::add_stop_to_region(StopID id, RegionID parentid)
             }
         }
         return false;
-
 }
-//O(1)
+
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
     auto iter = region_map.find(id);
@@ -432,10 +413,10 @@ std::vector<RegionID> Datastructures::stop_regions(StopID id)
 
 void Datastructures::creation_finished()
 {
-    // Replace this comment with your implementation
-    // You don't have to use this method for anything, if you don't need it
 }
+
 //O(n) n is the number of the points belonging to that region
+
 std::pair<Coord,Coord> Datastructures::region_bounding_box(RegionID id)
 {
 
@@ -475,7 +456,6 @@ std::pair<Coord,Coord> Datastructures::recursive_region_bounding_box(Region_ptr 
 
         if (region->subregions.size() == 0)
           return {min,max};
-
         for (auto const& subregion : region->subregions)
         {
             std::pair<Coord,Coord> sub_box = recursive_region_bounding_box(subregion.second);
@@ -501,13 +481,11 @@ std::pair<Coord,Coord> Datastructures::recursive_region_bounding_box(Region_ptr 
 
         }
     return {min,max};
-
   }
 }
 
 
 
-//O(n)
 std::vector<StopID> Datastructures::stops_closest_to(StopID id)
 {
     auto stop = mp.find(id);
@@ -527,7 +505,6 @@ std::vector<StopID> Datastructures::stops_closest_to(StopID id)
         }
         return temp;
     }
-
     std::nth_element(id_to_coordinate.begin(),id_to_coordinate.begin()+5,id_to_coordinate.end(),
                      [&](const V_ptr& point_a,const V_ptr& point_b)->bool
                        {
@@ -548,7 +525,6 @@ std::vector<StopID> Datastructures::stops_closest_to(StopID id)
     return temp;
 }
 
-//O(n), most case  average logn
 bool Datastructures::remove_stop(StopID id)
 {
     auto iter = mp.find(id);
@@ -556,6 +532,8 @@ bool Datastructures::remove_stop(StopID id)
         return false;
     if (iter->second->r_id != NO_REGION)
         region_map.at(iter->second->r_id)->subpoints.erase(id);
+
+    //delete in namemap (map : name->id)
     if (namemap_is_added)
     {
         auto pair = namemap.equal_range(iter->second->name);
@@ -571,7 +549,7 @@ bool Datastructures::remove_stop(StopID id)
         namemap.erase(name_iter);
     }
 
-
+    //delete in map_point mp (stopid-> Point_ptr)
     if (id_to_coordinate.size() == 1)
     {
         coord_max = nullptr;
@@ -582,7 +560,7 @@ bool Datastructures::remove_stop(StopID id)
         vector_is_sorted = false;
         return true;
     }
-
+    //if removing max
     if (coord_max->id == id)
     {
 
@@ -590,10 +568,10 @@ bool Datastructures::remove_stop(StopID id)
             coord_max = mp.at(id_to_coordinate[id_to_coordinate.size()-2]->first);
         else
         {
+            //swaping the last element of vector and the already known element then erase cost O(1).
             mp.at(id_to_coordinate[id_to_coordinate.size()-1]->first)->ptr_v = iter->second->ptr_v;
             iter->second->ptr_v->first = id_to_coordinate[id_to_coordinate.size()-1]->first;
             iter->second->ptr_v->second = id_to_coordinate[id_to_coordinate.size()-1]->second;
-
             auto max = std::max_element(id_to_coordinate.begin(),id_to_coordinate.end()-1,[&](auto const& ptr1, auto const& ptr2)->bool
             {
                 return ptr1->second<ptr2->second;
@@ -601,13 +579,13 @@ bool Datastructures::remove_stop(StopID id)
             coord_max =  mp.at((*max)->first);
         }
         mp.erase(iter);
-
         id_to_coordinate.erase(id_to_coordinate.end()-1);
         return true;
     }
-
+    //if removing min
      if (coord_min->id == id)
     {
+        //swaping the last element of vector and the already known element then erase cost O(1).
         mp.at(id_to_coordinate[id_to_coordinate.size()-1]->first)->ptr_v = iter->second->ptr_v;
         iter->second->ptr_v->first = id_to_coordinate[id_to_coordinate.size()-1]->first;
         iter->second->ptr_v->second = id_to_coordinate[id_to_coordinate.size()-1]->second;
@@ -620,14 +598,13 @@ bool Datastructures::remove_stop(StopID id)
                 return ptr1->second< ptr2->second;
             });
             coord_min =  mp.at((*min)->first);
-
         }
         mp.erase(iter);
         id_to_coordinate.erase(id_to_coordinate.end()-1);
         vector_is_sorted =false;
         return true;
     }
-
+    //swaping the last element of vector and the already known element then erase cost O(1).
     mp.at(id_to_coordinate[id_to_coordinate.size()-1]->first)->ptr_v = iter->second->ptr_v;
     iter->second->ptr_v->second = id_to_coordinate[id_to_coordinate.size()-1]->second;
     iter->second->ptr_v->first=id_to_coordinate[id_to_coordinate.size()-1]->first;
@@ -635,7 +612,6 @@ bool Datastructures::remove_stop(StopID id)
     id_to_coordinate.erase(id_to_coordinate.end()-1);
     vector_is_sorted = false;
     return true;
-
 }
 
 RegionID Datastructures::stops_common_region(StopID id1, StopID id2)
