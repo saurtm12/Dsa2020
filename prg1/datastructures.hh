@@ -96,8 +96,7 @@ public:
 
     // Estimate of performance: O(nlogn) first time, then O(n)
     // Short rationale for estimate: when the namemap hasnot been added,
-    // sorting name cost nlogn, then add to namemap (ordered_map) with hint iterator
-    // cost amortized constant time for 1 element, then adding n cost linear, overall
+    // add elements to ordered map overall
     // cost nlogn first time, then using ordered map, listing all id cost linear time
     // for the next time function is called.
     std::vector<StopID> stops_alphabetically();

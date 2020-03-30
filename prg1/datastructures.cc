@@ -144,28 +144,15 @@ std::vector<StopID> Datastructures::stops_alphabetically()
         }
         return temp_vector;
     }
-    std::vector<Point_ptr> vec;
-    vec.reserve(mp.size());
-    for(auto const& point : mp)
+
+    for (auto const& stop: mp)
     {
-        vec.push_back(point.second);
-    }
-    std::sort(vec.begin(), vec.end(),
-              [](const Point_ptr& point_a,const Point_ptr& point_b) -> bool
-                {
-                    return point_a->name < point_b->name;
-                } );
-    namemap_is_added = true;
-    auto iter = namemap.begin();
-    for (auto const& point: vec)
-    {
-        namemap.insert(iter,{point->name,point->id});
-        iter++;
+        namemap.insert({stop.second->name,stop.first});
     }
     namemap_is_added = true;
-    for (auto const& point : vec)
+    for (auto const& point : namemap)
     {
-        temp_vector.push_back(point->id);
+        temp_vector.push_back(point.second);
     }
     return temp_vector;
 }
@@ -218,29 +205,12 @@ std::vector<StopID> Datastructures::find_stops(Name const& name)
 {
     if (!namemap_is_added)
     {
-        std::vector<Point_ptr> vec;
-        vec.reserve(mp.size());
-        for(auto const& point : mp)
+        for (auto const& stop: mp)
         {
-            vec.push_back(point.second);
-        }
-
-        std::sort(vec.begin(), vec.end(),
-                  [](const Point_ptr& point_a,const Point_ptr& point_b) -> bool
-                    {
-                        return point_a->name < point_b->name;
-                    } );
-
-        auto iter = namemap.begin();
-        for (auto const& point: vec)
-        {
-            namemap.insert(iter,{point->name,point->id});
-            iter++;
+            namemap.insert({stop.second->name,stop.first});
         }
         namemap_is_added = true;
     }
-
-
     auto pair = namemap.equal_range(name);
     if (pair.first == namemap.end())
         return {};
@@ -498,10 +468,16 @@ std::vector<StopID> Datastructures::stops_closest_to(StopID id)
     {
         std::vector<StopID> temp;
         temp.reserve(5);
-        for (auto stop: mp)
+        std::sort(id_to_coordinate.begin(),id_to_coordinate.end(),
+                  [&](const V_ptr& point_a,const V_ptr& point_b)->bool
+                    {
+                       return square_distance(point_a->second,origin) < square_distance(point_b->second,origin);
+                    });
+
+        for (auto stop: id_to_coordinate)
         {
-            if (stop.second->id!=id)
-            temp.push_back(stop.second->id);
+            if (stop->first!=id)
+            temp.push_back(stop->first);
         }
         return temp;
     }
@@ -511,7 +487,7 @@ std::vector<StopID> Datastructures::stops_closest_to(StopID id)
                           return square_distance(point_a->second,origin) < square_distance(point_b->second,origin);
                        } );
     std::sort(id_to_coordinate.begin(),id_to_coordinate.begin()+5,
-              [&](const V_ptr& point_a,const V_ptr& point_b)->bool
+              [&](const V_ptr& point_a, const V_ptr& point_b)->bool
                 {
                    return square_distance(point_a->second,origin) < square_distance(point_b->second,origin);
                 });
