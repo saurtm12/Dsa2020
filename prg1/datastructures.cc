@@ -59,7 +59,8 @@ void Datastructures::clear_all()
     region_map.clear();
     namemap.clear();
     id_to_coordinate.clear();
-    vector_is_sorted =false;
+    vector_is_sorted = false;
+    namemap_is_added = false;
     coord_max = nullptr;
     coord_min = nullptr;
 }
@@ -466,7 +467,7 @@ std::vector<StopID> Datastructures::stops_closest_to(StopID id)
                     {
                        return square_distance(point_a->second,origin) < square_distance(point_b->second,origin);
                     });
-
+        vector_is_sorted = false;
         for (auto stop: id_to_coordinate)
         {
             if (stop->first!=id)
