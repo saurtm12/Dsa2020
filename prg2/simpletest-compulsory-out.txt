@@ -23,7 +23,7 @@ Added route R:
 1. One (1): route R 
 2. Two (2): 
 > routes_from 1
-1. One (1): route R 
+1. Two (2): route R 
 > routes_from 2
 No routes from stop Two: pos=(2,2), id=2
 
@@ -52,7 +52,7 @@ Added route X:
 1. Two (2): route X 
 2. Three (3): 
 > routes_from 2
-1. Two (2): route X 
+1. Three (3): route X 
 > journey_any 1 3
 1. One (1): distance 0
 2. Two (2): distance 1
@@ -69,8 +69,8 @@ Added route Y:
 2. X
 3. Y
 > routes_from 1
-1. One (1): route R 
-2. One (1): route Y 
+1. Two (2): route R 
+2. Four (4): route Y 
 > journey_any 1 2
 1. One (1): distance 0
 2. Two (2): distance 1

@@ -68,7 +68,7 @@ private:
     enum class StopwatchMode { OFF, ON, NEXT };
     StopwatchMode stopwatch_mode = StopwatchMode::OFF;
 
-    enum class ResultType { NOTHING, STOPIDLIST, REGIONIDLIST, JOURNEY, /*CYCLE*/ };
+    enum class ResultType { NOTHING, STOPIDLIST, REGIONIDLIST, JOURNEY, ROUTES };
     using CmdResultStopIDs = std::pair<RegionID, std::vector<StopID>>;
     using CmdResultRegionIDs = std::vector<RegionID>;
     using CmdResultJourney = std::vector<std::tuple<StopID, StopID, RouteID, Distance, Time>>;

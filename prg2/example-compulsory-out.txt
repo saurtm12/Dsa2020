@@ -40,8 +40,8 @@ Added route C:
 2. B
 3. C
 > routes_from 1
-1. One (1): route A 
-2. One (1): route C 
+1. Three (3): route A 
+2. Two (2): route C 
 > route_stops A
 1. One (1): route A 
 2. Three (3): route A 

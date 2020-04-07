@@ -502,13 +502,13 @@ Added route 20t:
 > stop_count
 Number of stops: 37
 > routes_from 12
-1. Keskustori H (12): route 17t 
-2. Keskustori H (12): route 25t 
-3. Keskustori H (12): route 3At 
-4. Keskustori H (12): route 3Bt 
+1. Rautatieasema C (504): route 17t 
+2. Aleksanterinkatu  (553): route 25t 
+3. Rautatieasema C (504): route 3At 
+4. Rautatieasema C (504): route 3Bt 
 > routes_from 80
-1. Hameenpuisto 31 (80): route 115t 
-2. Hameenpuisto 31 (80): route 6t 
+1. Keskustori I (42): route 115t 
+2. Keskustori F (10): route 6t 
 > route_stops 14c
 1. Rautatieasema F (526): route 14c 
 2. Klassillinen koulu (528): route 14c 
@@ -11513,8 +11513,8 @@ Added trip to route 20t
 > 
 ** End of commands from 'Tre-Ksksta-trips.txt'
 > routes_from 526
-1. Rautatieasema F (526): route 14c 
-2. Rautatieasema F (526): route 32c 
+1. Klassillinen koulu (528): route 14c 
+2. Rongankatu 9 (108): route 32c 
 > route_times_from 14c 526
 Route 14c leaves from stop Rautatieasema F: pos=(1238,591), id=526
  at following times:

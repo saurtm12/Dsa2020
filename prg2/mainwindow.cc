@@ -168,7 +168,7 @@ void MainWindow::update_view()
             std::for_each(prev_result.second.begin(), prev_result.second.end(),
                           [&result_stops, &i](auto id){ result_stops[id] += MainProgram::convert_to_string(++i)+". "; });
         }
-        else if (mainprg_.prev_result.first == MainProgram::ResultType::JOURNEY)
+        else if (mainprg_.prev_result.first == MainProgram::ResultType::JOURNEY || mainprg_.prev_result.first == MainProgram::ResultType::ROUTES)
         {
             auto& prev_result = std::get<MainProgram::CmdResultJourney>(mainprg_.prev_result.second);
             int i = 1;
@@ -328,7 +328,7 @@ void MainWindow::update_view()
                     int zvalue = -2;
 
                     string resstr;
-                    if (mainprg_.prev_result.first == MainProgram::ResultType::JOURNEY /*|| mainprg_.prev_result.first == MainProgram::ResultType::CYCLE*/)
+                    if (mainprg_.prev_result.first == MainProgram::ResultType::JOURNEY || mainprg_.prev_result.first == MainProgram::ResultType::ROUTES)
                     {
                         auto res_place2 = journey_result.find({stopid, stopid2});
 

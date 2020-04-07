@@ -542,7 +542,7 @@ MainProgram::CmdResult MainProgram::cmd_routes_from(std::ostream& output, MainPr
     transform(routes.begin(), routes.end(), back_inserter(result),
               [stopid](auto route)mutable{ return make_tuple(stopid, route.second, route.first, NO_DISTANCE, NO_TIME); });
 
-    return {ResultType::JOURNEY, CmdResultJourney{result}};
+    return {ResultType::ROUTES, CmdResultJourney{result}};
 }
 
 void MainProgram::test_routes_from()
@@ -1864,51 +1864,33 @@ bool MainProgram::command_parse_line(string inputline, ostream& output)
                         }
                         break;
                     }
-//                    case ResultType::CYCLE:
-//                    {
-//                        auto& res = std::get<CmdResultRegionIDs>(result.second);
-//                        if (!res.empty())
-//                        {
-//                            if (res.size() == 1 && res.front() == NO_COORD)
-//                            {
-//                                output << "Unknown coordinate (NO_COORD)" << std::endl;
-//                            }
-//                            else
-//                            {
-//                                unsigned int num = 0;
-//                                if (res.size() < 2)
-//                                {
-//                                    output << "Too small path for cycle!";
-//                                }
-//                                else
-//                                {
-//                                    auto cycbeg = std::find(res.begin(), res.end()-1, res.back());
-//                                    if (cycbeg == res.end())
-//                                    {
-//                                        output << "No cycle found in path!";
-//                                    }
-//                                    else
-//                                    {
-//                                        // Swap cycle so that it starts with smaller id
-//                                        if (((cycbeg+1) < (res.end()-2)) && (*(res.end()-2) < *(cycbeg+1)))
-//                                        {
-//                                            std::reverse(cycbeg+1, res.end()-1);
-//                                        }
-//                                        for (auto i = cycbeg; i != res.end(); ++i)
-//                                        {
-//                                            Coord xy = *i;
-//                                            output << num << ". ";
-//                                            if (num > 0) { output << "-> "; }
-//                                            else { output << "   "; }
-//                                            ++num;
-//                                            output << "(" << xy.x << "," << xy.y << ")" << std::endl;
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        break;
-//                    }
+                case ResultType::ROUTES:
+                {
+                    auto& journey = std::get<CmdResultJourney>(result.second);
+                    if (!journey.empty())
+                    {
+                        if (journey.size() == 1 && get<0>(journey.front()) == NO_STOP)
+                        {
+                            output << "Failed (NO_... returned)!!" << std::endl;
+                        }
+                        else
+                        {
+                            unsigned int num = 1;
+                            for (auto& [startid, stopid, routeid, distance, time] : journey)
+                            {
+                                output << num << ". ";
+                                ++num;
+                                print_stop_name(stopid, output);
+                                output << " (" << stopid << "): ";
+                                if (routeid != NO_ROUTE) { output << "route " << routeid << " "; }
+                                if (time != NO_TIME) { output << "at "; print_time(time, output); output << " "; }
+                                if (distance != NO_DISTANCE) { output << "distance " << distance; }
+                                output << endl;
+                            }
+                        }
+                    }
+                    break;
+                }
                     default:
                     {
                         assert(false && "Unsupported result type!");

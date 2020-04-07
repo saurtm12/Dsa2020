@@ -11428,8 +11428,8 @@ Added trip to route 20t
 ** End of commands from 'Tre-Ksksta-trips.txt'
 > # Test journey with earliest arrival time
 > routes_from 526
-1. Rautatieasema F (526): route 14c 
-2. Rautatieasema F (526): route 32c 
+1. Klassillinen koulu (528): route 14c 
+2. Rongankatu 9 (108): route 32c 
 > route_times_from 14c 526
 Route 14c leaves from stop Rautatieasema F: pos=(1238,591), id=526
  at following times:
