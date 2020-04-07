@@ -90,12 +90,22 @@ Route C leaves from stop Two: pos=(6,2), id=2
 3. Five (5): at 09:30:00 
 > journey_earliest_arrival 1 6 08:00:00
 No journey found!
+> add_route D 5 4
+Added route D:
+1. Five (5): route D 
+2. Four (4): 
 > add_trip D 08:25:00 08:30:00
-Route is reported to have 1 stops, but there are 2 stop times!
+Added trip to route D
+1. Five (5): route D at 08:25:00 
+2. Four (4): at 08:30:00 
 > route_times_from A 1
 Route A leaves from stop One: pos=(1,1), id=1
  at following times:
 08:30:00 ( duration 00:10:00)
 > journey_earliest_arrival 1 6 08:00:00
-No journey found!
+1. One (1): route C at 08:00:00 
+2. Two (2): route C at 08:10:00 
+3. Five (5): route D at 08:25:00 
+4. Four (4): route B at 08:45:00 
+5. Six (6): at 09:00:00 
 > 
