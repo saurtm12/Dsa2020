@@ -178,7 +178,6 @@ std::vector<StopID> Datastructures::stops_coord_order()
     {
         temp_vector.push_back(point->first);
     }
-
     return temp_vector;
 }
 
@@ -245,7 +244,6 @@ bool Datastructures::change_stop_name(StopID id, const Name& newname)
     }
     point->second->name = newname;
     return true;
-
 }
 
 //if change min/max, then we have to find min/max again.
@@ -387,7 +385,6 @@ void Datastructures::creation_finished()
 
 std::pair<Coord,Coord> Datastructures::region_bounding_box(RegionID id)
 {
-
     Region_ptr region = region_map.at(id);
     auto result = this->recursive_region_bounding_box(region);
     if (result.second == NO_COORD)
