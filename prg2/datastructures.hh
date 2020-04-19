@@ -32,6 +32,7 @@ struct Coord
     int x = NO_VALUE;
     int y = NO_VALUE;
 };
+double square_distance(Coord c1, Coord c2);
 
 // Example: Defining == and hash function for Coord so that it can be used
 // as key for std::unordered_map/set, if needed
@@ -42,6 +43,10 @@ inline bool operator!=(Coord c1, Coord c2) { return !(c1==c2); } // Not strictly
 // as key for std::map/set
 inline bool operator<(Coord c1, Coord c2)
 {
+    if (c1.x*c1.x + c1.y*c1.y < c2.x*c2.x + c2.y*c2.y)
+        {return true;}
+    else if (c1.x*c1.x + c1.y*c1.y > c2.x*c2.x + c2.y*c2.y)
+        {return false;}
     if (c1.y < c2.y) { return true; }
     else if (c2.y < c1.y) { return false; }
     else { return c1.x < c2.x; }
@@ -237,7 +242,59 @@ public:
     void add_walking_connections(); // Note! This method is completely optional, and not part of any testing
 
 private:
-    // Add stuff needed for your class implementation here
+
+    using V_ptr = std::shared_ptr<std::pair<StopID,Coord>>;
+    struct Point{
+        StopID id;
+        Name name;
+        Coord coord;
+        RegionID r_id = NO_REGION;
+        // this pointer is the pointer of the pair that stores in the vector.
+        V_ptr ptr_v;
+        //constructor
+        Point(const StopID& id_,const Name& name_,const Coord& coord_,
+        const V_ptr ptr_v_)
+        {
+            id = id_;
+            name = name_;
+            coord = coord_;
+            ptr_v = ptr_v_;
+        }
+    };
+    using Point_ptr =  std::shared_ptr <Point>;
+    //this map contains keys are name, then values are stop_id.
+    std::multimap <Name, StopID > namemap;
+    //this map contains keys are stop_id, then values are pointer point to Point.
+    std::unordered_map < StopID,Point_ptr > mp;
+    //this vector contains pair stop_id and coord.
+    std::vector<V_ptr>  id_to_coordinate;
+    //if vector is sorted by coord, then this value is true;
+    bool vector_is_sorted = false;
+    //if the namemap is inserted, then this value is true;
+    bool namemap_is_added = false;
+    Point_ptr coord_min = nullptr;
+    Point_ptr coord_max = nullptr;
+
+    struct Region{
+        RegionID id;
+        Name name;
+        //this map contains subpoints of this region
+        std::unordered_map <StopID,Point_ptr> subpoints;
+        //this map contains subregions of this regions
+        std::unordered_map <RegionID,std::shared_ptr<Region>> subregions;
+        std::shared_ptr<Region> parent_region =nullptr;
+        //constructor
+        Region(RegionID id_, Name name_)
+        {
+            id = id_;
+            name = name_;
+        }
+    };
+    using Region_ptr = std::shared_ptr<Region>;
+    //this map contain regions
+    std::unordered_map <RegionID, Region_ptr> region_map;
+    //this function is recursive for finding the bounding box of a region.
+    std::pair<Coord,Coord> recursive_region_bounding_box(Region_ptr region);
 
 };
 
