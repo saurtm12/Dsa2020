@@ -648,16 +648,16 @@ bool Datastructures::add_route(RouteID id, std::vector<StopID> stops)
     }
 
     auto end_route = mp.find(stops.back());
-    end_route->second->next_stop.insert({NO_DISTANCE,{id,NO_STOP}});
+    end_route->second->next_stop.insert({id,{NO_STOP,NO_DISTANCE,nullptr}});
     Coord previous_coord = end_route->second->coord;
     for (auto iterator = stops.end()-2; iterator != stops.begin()-1; iterator--)
     {
         auto find_stop = mp.find(*iterator);
         find_stop->second->next_stop.insert(
-        {round(sqrt(square_distance(previous_coord,find_stop->second->coord)))
-                ,{id,*(--iterator)}});
+        { id, {*(--iterator),
+               round(sqrt(square_distance(previous_coord,find_stop->second->coord))),
+               find_stop->second} });
     }
-
     routes.insert({id,stops});
     return true;
 }
@@ -674,7 +674,7 @@ std::vector<std::pair<RouteID, StopID>> Datastructures::routes_from(StopID stopi
     temp_vector.reserve(iter->second->next_stop.size());
     for (auto& next : iter->second->next_stop)
     {
-        temp_vector.push_back(next.second);
+        temp_vector.push_back({next.first,std::get<1>(next.second)});
     }
     return temp_vector;
 }
@@ -703,7 +703,26 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_any(S
     {
         return {{NO_STOP, NO_ROUTE, NO_DISTANCE}};
     }
-    return {{NO_STOP, NO_ROUTE, NO_DISTANCE}};
+    auto end = mp.find(tostop);
+    if (end == mp.end())
+    {
+        return {{NO_STOP, NO_ROUTE, NO_DISTANCE}};
+    }
+    std::vector<RouteID> common_routes;
+    if (start->second->next_stop.size()< end->second->next_stop.size())
+    {
+        auto route_not_found = end->second->next_stop.end();
+        for (auto& route: start->second->next_stop)
+        {
+            auto iter_find_route = end->second->next_stop.find(route.first);
+            if (iter_find_route != route_not_found)
+            {
+                common_routes.push_back(route.first);
+            }
+        }
+    }
+
+
 }
 
 std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_least_stops(StopID fromstop, StopID tostop)

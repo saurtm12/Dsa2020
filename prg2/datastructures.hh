@@ -80,7 +80,6 @@ using Distance = int;
 Distance const NO_DISTANCE = NO_VALUE;
 
 
-
 // This is the class you are supposed to implement
 
 class Datastructures
@@ -248,7 +247,6 @@ public:
     void add_walking_connections(); // Note! This method is completely optional, and not part of any testing
 
 private:
-
     using V_ptr = std::shared_ptr<std::pair<StopID,Coord>>;
     struct Point{
         StopID id;
@@ -258,16 +256,17 @@ private:
         // this pointer is the pointer of the pair that stores in the vector.
         V_ptr ptr_v;
         //phase2:
-        std::unordered_map<Distance, std::pair<RouteID,StopID>> next_stop;
+        using Point_ptr =  std::shared_ptr <Point>;
+        std::unordered_map<RouteID, std::tuple<StopID,Distance,Point_ptr>> next_stop;
 
         //constructor
-        Point(const StopID& id_,const Name& name_,const Coord& coord_,
-        const V_ptr ptr_v_)
+        Point(const StopID& id_,const Name& name_,const Coord& coord_, V_ptr ptr_v_):
+            id(id_),
+            name(name_),
+            coord(coord_),
+            ptr_v(ptr_v_)
         {
-            id = id_;
-            name = name_;
-            coord = coord_;
-            ptr_v = ptr_v_;
+
         }
     };
     using Point_ptr =  std::shared_ptr <Point>;
