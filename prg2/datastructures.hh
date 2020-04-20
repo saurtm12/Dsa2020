@@ -8,6 +8,12 @@
 #include <tuple>
 #include <utility>
 #include <limits>
+#include <memory>
+#include <algorithm>
+#include <cmath>
+#include <unordered_map>
+#include <map>
+#include <unordered_set>
 
 // Types for IDs
 using StopID = long int;
@@ -83,7 +89,7 @@ public:
     Datastructures();
     ~Datastructures();
 
-    // Estimate of performance:
+    // Estimate of performance
     // Short rationale for estimate:
     int stop_count();
 
@@ -251,6 +257,9 @@ private:
         RegionID r_id = NO_REGION;
         // this pointer is the pointer of the pair that stores in the vector.
         V_ptr ptr_v;
+        //phase2:
+        std::unordered_map<Distance, std::pair<RouteID,StopID>> next_stop;
+
         //constructor
         Point(const StopID& id_,const Name& name_,const Coord& coord_,
         const V_ptr ptr_v_)
@@ -295,6 +304,10 @@ private:
     std::unordered_map <RegionID, Region_ptr> region_map;
     //this function is recursive for finding the bounding box of a region.
     std::pair<Coord,Coord> recursive_region_bounding_box(Region_ptr region);
+
+    // phase 2:
+    using Route = std::vector <StopID>;
+    std::unordered_map<RouteID,Route> routes;
 
 };
 

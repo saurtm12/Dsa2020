@@ -39,6 +39,7 @@ Datastructures::~Datastructures()
     }
     coord_min = nullptr;
     coord_max = nullptr;
+}
 
 int Datastructures::stop_count()
 {
@@ -61,6 +62,9 @@ void Datastructures::clear_all()
     namemap_is_added = false;
     coord_max = nullptr;
     coord_min = nullptr;
+
+    //phase 2:
+    routes.clear();
 }
 
 std::vector<StopID> Datastructures::all_stops()
@@ -612,36 +616,93 @@ double square_distance(Coord c1, Coord c2)
 
 std::vector<RouteID> Datastructures::all_routes()
 {
-    // Replace this comment and the line below with your implementation
-    return {NO_ROUTE};
+    if (routes.size() == 0)
+        return {NO_ROUTE};
+    std::vector <RouteID> temp;
+    temp.reserve(routes.size());
+    for (auto const& route : routes)
+    {
+        temp.push_back(route.first);
+    }
+    return temp;
 }
 
 bool Datastructures::add_route(RouteID id, std::vector<StopID> stops)
 {   
-    // Replace this comment and the line below with your implementation
-    return false;
+    auto iter = routes.find(id);
+    if (iter != routes.end())
+    {
+        return false;
+    }
+    if (stops.size() == 0)
+    {
+        return false;
+    }
+    for (auto const& stop : stops)
+    {
+        auto find_stop = mp.find(stop);
+        if (find_stop == mp.end())
+        {
+            return false;
+        }
+    }
+
+    auto end_route = mp.find(stops.back());
+    end_route->second->next_stop.insert({NO_DISTANCE,{id,NO_STOP}});
+    Coord previous_coord = end_route->second->coord;
+    for (auto iterator = stops.end()-2; iterator != stops.begin()-1; iterator--)
+    {
+        auto find_stop = mp.find(*iterator);
+        find_stop->second->next_stop.insert(
+        {round(sqrt(square_distance(previous_coord,find_stop->second->coord)))
+                ,{id,*(--iterator)}});
+    }
+
+    routes.insert({id,stops});
+    return true;
 }
 
 std::vector<std::pair<RouteID, StopID>> Datastructures::routes_from(StopID stopid)
 {
-    // Replace this comment and the line below with your implementation
-    return {{NO_ROUTE, NO_STOP}};
+    auto iter = mp.find(stopid);
+    if (iter == mp.end())
+    {
+        return {{NO_ROUTE, NO_STOP}};
+    }
+
+    std::vector<std::pair<RouteID, StopID>> temp_vector;
+    temp_vector.reserve(iter->second->next_stop.size());
+    for (auto& next : iter->second->next_stop)
+    {
+        temp_vector.push_back(next.second);
+    }
+    return temp_vector;
 }
 
 std::vector<StopID> Datastructures::route_stops(RouteID id)
 {
-    // Replace this comment and the line below with your implementation
-    return {NO_STOP};
+    auto iter = routes.find(id);
+    if (iter == routes.end())
+        return {NO_STOP};
+    return iter->second;
 }
 
 void Datastructures::clear_routes()
 {
-    // Replace this comment and the line below with your implementation
+    routes.clear();
+    for (auto& point: mp)
+    {
+        point.second->next_stop.clear();
+    }
 }
 
 std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_any(StopID fromstop, StopID tostop)
 {
-    // Replace this comment and the line below with your implementation
+    auto start = mp.find(fromstop);
+    if (start  == mp.end())
+    {
+        return {{NO_STOP, NO_ROUTE, NO_DISTANCE}};
+    }
     return {{NO_STOP, NO_ROUTE, NO_DISTANCE}};
 }
 
