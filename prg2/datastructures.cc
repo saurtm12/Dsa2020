@@ -5,7 +5,8 @@
 #include <random>
 #include <cmath>
 #include <stdexcept>
-
+#include <queue>
+#include <stack>
 std::minstd_rand rand_engine; // Reasonably quick pseudo-random generator
 
 template <typename Type>
@@ -31,14 +32,7 @@ Datastructures::Datastructures()
 
 Datastructures::~Datastructures()
 {
-    for(auto& region : region_map)
-    {
-        region.second->subpoints.clear();
-        region.second->subregions.clear();
-        region.second->parent_region = nullptr;
-    }
-    coord_min = nullptr;
-    coord_max = nullptr;
+
 }
 
 int Datastructures::stop_count()
@@ -49,12 +43,6 @@ int Datastructures::stop_count()
 void Datastructures::clear_all()
 {
     mp.clear();
-    for(auto& region : region_map)
-    {
-        region.second->subpoints.clear();
-        region.second->subregions.clear();
-        region.second->parent_region = nullptr;
-    }
     region_map.clear();
     namemap.clear();
     id_to_coordinate.clear();
@@ -87,10 +75,10 @@ bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
     }
     id_to_coordinate.push_back(std::make_shared<std::pair<StopID,Coord>>(id,xy));
     std::shared_ptr <Point> new_point = std::make_shared<Point>(id, name,xy,id_to_coordinate[id_to_coordinate.size()-1]);
+    new_point->color = global_white;
     mp.insert({id,new_point});
     if (namemap_is_added)
         namemap.insert({name,id});
-
     if (id_to_coordinate.size() == 1)
     {
         coord_max = new_point;
@@ -107,7 +95,6 @@ bool Datastructures::add_stop(StopID id, const Name& name, Coord xy)
         }
     if (new_point->coord < coord_min->coord )
         coord_min = new_point;
-    new_point = nullptr;
     return true;
 }
 
@@ -638,6 +625,8 @@ bool Datastructures::add_route(RouteID id, std::vector<StopID> stops)
     {
         return false;
     }
+
+
     for (auto const& stop : stops)
     {
         auto find_stop = mp.find(stop);
@@ -647,16 +636,15 @@ bool Datastructures::add_route(RouteID id, std::vector<StopID> stops)
         }
     }
 
-    auto end_route = mp.find(stops.back());
-    end_route->second->next_stop.insert({id,{NO_STOP,NO_DISTANCE,nullptr}});
-    Coord previous_coord = end_route->second->coord;
+    auto next_stop_iter = mp.find(stops.back());
+    next_stop_iter->second->next_stop.insert({id,{NO_DISTANCE,nullptr}});
     for (auto iterator = stops.end()-2; iterator != stops.begin()-1; iterator--)
     {
         auto find_stop = mp.find(*iterator);
         find_stop->second->next_stop.insert(
-        { id, {*(--iterator),
-               round(sqrt(square_distance(previous_coord,find_stop->second->coord))),
-               find_stop->second} });
+        { id, {(int)(sqrt(square_distance(next_stop_iter->second->coord,find_stop->second->coord))),
+               next_stop_iter->second} });
+        next_stop_iter = find_stop;
     }
     routes.insert({id,stops});
     return true;
@@ -674,9 +662,18 @@ std::vector<std::pair<RouteID, StopID>> Datastructures::routes_from(StopID stopi
     temp_vector.reserve(iter->second->next_stop.size());
     for (auto& next : iter->second->next_stop)
     {
-        temp_vector.push_back({next.first,std::get<1>(next.second)});
+        if (((next.second).second) != nullptr )
+            temp_vector.push_back({next.first,((next.second).second)->id});
     }
     return temp_vector;
+}
+
+void Datastructures::reset_color()
+{
+    *global_black = WHITE;
+    *global_gray = WHITE;
+    global_black = std::make_shared<Color>(BLACK);
+    global_gray = std::make_shared<Color>(GRAY);
 }
 
 std::vector<StopID> Datastructures::route_stops(RouteID id)
@@ -708,21 +705,68 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_any(S
     {
         return {{NO_STOP, NO_ROUTE, NO_DISTANCE}};
     }
-    std::vector<RouteID> common_routes;
-    if (start->second->next_stop.size()< end->second->next_stop.size())
+    std::queue<std::tuple<Point_ptr,RouteID, Distance>> visit;
+    end->second->previous_node = {nullptr,NO_ROUTE,NO_DISTANCE};
+    start->second->color = global_black;
+    visit.push({start->second, NO_ROUTE, NO_DISTANCE});
+    while (visit.size() != 0)
     {
-        auto route_not_found = end->second->next_stop.end();
-        for (auto& route: start->second->next_stop)
+        auto current = visit.front();
+        visit.pop();
+        for (auto& direct : (std::get<0>(current))->next_stop)
         {
-            auto iter_find_route = end->second->next_stop.find(route.first);
-            if (iter_find_route != route_not_found)
+            if ((direct.second).second != nullptr)
             {
-                common_routes.push_back(route.first);
+                if (*(((direct.second).second)->color) == WHITE)
+                {
+                    visit.push({ ((direct.second).second), direct.first, (direct.second).first });
+                    ((direct.second).second)->previous_node = {(std::get<0>(current)),direct.first,(direct.second).first};
+                    if (((direct.second).second)->id == tostop)
+                    {
+                        goto end_loop;
+                    }
+                }
             }
         }
+        (std::get<0>(current))->color = global_black;
     }
 
 
+    end_loop:
+    if (std::get<0>(end->second->previous_node) == nullptr)
+    {
+        return {};
+    }
+
+
+    //adding result;
+    auto current = end->second->previous_node;
+    std::vector<std::tuple<Point_ptr,RouteID, Distance>> temp_vector;
+    while ((std::get<0>(current)) != start->second )
+    {
+        temp_vector.push_back(current);
+        current = (std::get<0>(current))->previous_node;
+    }
+    temp_vector.push_back(current);
+
+    std::vector<std::tuple<StopID, RouteID, Distance>> result;
+
+    for (auto iter = temp_vector.rbegin(); iter != temp_vector.rend(); iter++)
+    {
+        result.push_back({(std::get<0>(*(iter)))->id,std::get<1>(*iter),std::get<2>(*iter)});
+    }
+    result.push_back({end->second->id,NO_ROUTE,NO_DISTANCE});
+    for (auto iter = result.rbegin(); iter != result.rend()-1;iter++)
+    {
+        std::get<2>(*iter)= std::get<2>(*(iter+1));
+    }
+    std::get<2>(result.front()) = 0;
+    for (auto iter = result.begin()+1;iter != result.end();iter++)
+    {
+        std::get<2>(*iter) += std::get<2>(*(iter-1));
+    }
+    reset_color();
+    return result;
 }
 
 std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_least_stops(StopID fromstop, StopID tostop)

@@ -2,7 +2,7 @@
 
 #ifndef DATASTRUCTURES_HH
 #define DATASTRUCTURES_HH
-
+#include <iostream>
 #include <string>
 #include <vector>
 #include <tuple>
@@ -247,6 +247,16 @@ public:
     void add_walking_connections(); // Note! This method is completely optional, and not part of any testing
 
 private:
+    //phase 2 : set color
+    using Color = int;
+    const Color WHITE = 0,
+                GRAY   = 1,
+                BLACK = -1;
+    std::shared_ptr<Color> global_white = std::make_shared<Color>(WHITE);
+    std::shared_ptr<Color> global_gray = std::make_shared<Color>(GRAY);
+    std::shared_ptr<Color> global_black = std::make_shared<Color>(BLACK);
+    void reset_color();
+
     using V_ptr = std::shared_ptr<std::pair<StopID,Coord>>;
     struct Point{
         StopID id;
@@ -257,8 +267,9 @@ private:
         V_ptr ptr_v;
         //phase2:
         using Point_ptr =  std::shared_ptr <Point>;
-        std::unordered_map<RouteID, std::tuple<StopID,Distance,Point_ptr>> next_stop;
-
+        std::unordered_multimap<RouteID, std::pair<Distance,Point_ptr>> next_stop;
+        std::tuple<Point_ptr,RouteID, Distance> previous_node ;
+        std::shared_ptr <Color> color;
         //constructor
         Point(const StopID& id_,const Name& name_,const Coord& coord_, V_ptr ptr_v_):
             id(id_),
