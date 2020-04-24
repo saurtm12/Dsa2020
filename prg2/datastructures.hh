@@ -81,7 +81,6 @@ Distance const NO_DISTANCE = NO_VALUE;
 
 
 // This is the class you are supposed to implement
-
 class Datastructures
 {
 public:
@@ -267,8 +266,9 @@ private:
         V_ptr ptr_v;
         //phase2:
         using Point_ptr =  std::shared_ptr <Point>;
-        std::unordered_multimap<RouteID, std::pair<Distance,Point_ptr>> next_stop;
-        std::tuple<Point_ptr,RouteID, Distance> previous_node ;
+      //  std::unordered_multimap<RouteID, std::pair<Distance,Point_ptr>> next_stop;
+        std::vector<std::tuple<Point_ptr,RouteID, Distance, Time>> next_stop;
+        std::tuple<Point_ptr,RouteID, Distance, Time> previous_node ;
         std::shared_ptr <Color> color;
         //constructor
         Point(const StopID& id_,const Name& name_,const Coord& coord_, V_ptr ptr_v_):
@@ -318,7 +318,6 @@ private:
     // phase 2:
     using Route = std::vector <StopID>;
     std::unordered_map<RouteID,Route> routes;
-
 };
 
 #endif // DATASTRUCTURES_HH
