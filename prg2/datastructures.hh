@@ -270,6 +270,8 @@ private:
         std::vector<std::tuple<Point_ptr,RouteID, Distance, Time>> next_stop;
         std::tuple<Point_ptr,RouteID, Distance, Time> previous_node ;
         std::shared_ptr <Color> color;
+        Distance d;
+        Time t;
         //constructor
         Point(const StopID& id_,const Name& name_,const Coord& coord_, V_ptr ptr_v_):
             id(id_),
@@ -318,6 +320,42 @@ private:
     // phase 2:
     using Route = std::vector <StopID>;
     std::unordered_map<RouteID,Route> routes;
+
+    class Route_Info_Distance
+    {
+    public:
+        Route_Info_Distance(Point_ptr ptr_, RouteID id_, Distance distance_):
+            ptr(ptr_),
+            id(id_),
+            distance(distance_)
+        {
+
+        }
+        Point_ptr get0() const
+        {
+            return ptr;
+        }
+        RouteID get1() const
+        {
+            return id;
+        }
+        Distance get2() const
+        {
+            return distance;
+        }
+    private:
+        Point_ptr ptr;
+        RouteID id;
+        Distance distance;
+    };
+    struct compare_distance
+    {
+        bool operator()(const Route_Info_Distance& info1,const Route_Info_Distance& info2)
+        {
+            return info1.get2()>info2.get2();
+        }
+    };
 };
+
 
 #endif // DATASTRUCTURES_HH
