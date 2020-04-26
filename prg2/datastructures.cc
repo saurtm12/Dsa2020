@@ -636,14 +636,13 @@ bool Datastructures::add_route(RouteID id, std::vector<StopID> stops)
     }
 
     auto next_stop_iter = mp.find(stops.back());
-    next_stop_iter->second->next_stop.push_back({nullptr, id, NO_DISTANCE, NO_TIME});
+    next_stop_iter->second->next_stop.push_back({nullptr, id, NO_DISTANCE});
     for (auto iterator = stops.end()-2; iterator != stops.begin()-1; iterator--)
     {
         auto find_stop = mp.find(*iterator);
         find_stop->second->next_stop.push_back(
         { next_stop_iter->second, id,
-          (int)(sqrt(square_distance(next_stop_iter->second->coord,find_stop->second->coord))),
-           NO_TIME});
+          (int)(sqrt(square_distance(next_stop_iter->second->coord,find_stop->second->coord)))});
         next_stop_iter = find_stop;
     }
     routes.insert({id,stops});
@@ -710,9 +709,9 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_any(S
         return {};
     }
 
-    std::queue<std::tuple<Point_ptr,RouteID, Distance, Time>> visit;
-    end->second->previous_node = {nullptr, NO_ROUTE, NO_DISTANCE, NO_TIME};
-    visit.push({start->second, NO_ROUTE, 0,NO_TIME});
+    std::queue<std::tuple<Point_ptr,RouteID, Distance>> visit;
+    end->second->previous_node = {nullptr, NO_ROUTE, NO_DISTANCE};
+    visit.push({start->second, NO_ROUTE, 0});
     //last route is for tracking the last route followed
     std::tuple<StopID,RouteID, Distance> last_route ;
     while (visit.size() != 0)
@@ -726,9 +725,10 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_any(S
                 if (*((std::get<0>(direct))->color) == WHITE)
                 {
                     visit.push(direct);
+                    std::get<0>(direct)->color = global_gray;
                     //in this case, this value should be assign by {std::get<0>(current),std::get<1>(direct),std::get<2>(direct),std::get<3>(direct)}
                     //but I want to optimize running time, so I would assign it to current, so actually it it one more previous point
-                    //A->B->C and this previous_node actually contains B but the value (ROUTE) are wrong, it is routing from A->B.
+                    //A->B->C and this previous_node actually contains B but the values (ROUTE and DISTANCE) are wrong, it is routing from A->B.
                     //copy constructor is more slower than assign to already exist value (by testing)
                     //and the final values are much easy to find (only one tracking)
                     std::get<0>(direct)->previous_node = current;
@@ -752,7 +752,7 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_any(S
 
     //adding result;
     auto current = end->second->previous_node;
-    std::vector<std::tuple<Point_ptr,RouteID, Distance, Time>> temp_vector;
+    std::vector<std::tuple<Point_ptr,RouteID, Distance>> temp_vector;
     while ((std::get<0>(current)) != start->second )
     {
         temp_vector.push_back(current);
@@ -795,9 +795,9 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_least
         return {};
     }
 
-    std::queue<std::tuple<Point_ptr,RouteID, Distance, Time>> visit;
-    end->second->previous_node = {nullptr, NO_ROUTE, NO_DISTANCE, NO_TIME};
-    visit.push({start->second, NO_ROUTE, 0,NO_TIME});
+    std::queue<std::tuple<Point_ptr,RouteID, Distance>> visit;
+    end->second->previous_node = {nullptr, NO_ROUTE, NO_DISTANCE};
+    visit.push({start->second, NO_ROUTE, 0});
     //last route is for tracking the last route followed
     std::tuple<StopID,RouteID, Distance> last_route ;
     while (visit.size() != 0)
@@ -811,9 +811,10 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_least
                 if (*((std::get<0>(direct))->color) == WHITE)
                 {
                     visit.push(direct);
+                    std::get<0>(direct)->color = global_gray;
                     //in this case, this value should be assign by {std::get<0>(current),std::get<1>(direct),std::get<2>(direct),std::get<3>(direct)}
                     //but I want to optimize running time, so I would assign it to current, so actually it it one more previous point
-                    //A->B->C and this previous_node actually contains B but the value (ROUTE) are wrong, it is routing from A->B.
+                    //A->B->C and this previous_node actually contains B but the values (ROUTE and DISTANCE) are wrong, it is routing from A->B.
                     //copy constructor is more slower than assign to already exist value (by testing)
                     //and the final values are much easy to find (only one tracking)
                     std::get<0>(direct)->previous_node = current;
@@ -837,7 +838,7 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_least
 
     //adding result;
     auto current = end->second->previous_node;
-    std::vector<std::tuple<Point_ptr,RouteID, Distance, Time>> temp_vector;
+    std::vector<std::tuple<Point_ptr,RouteID, Distance>> temp_vector;
     while ((std::get<0>(current)) != start->second )
     {
         temp_vector.push_back(current);
@@ -870,12 +871,12 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_with_
     {
         return {{NO_STOP, NO_ROUTE, NO_DISTANCE}};
     }
-    std::stack<std::tuple<Point_ptr,RouteID, Distance, Time>> visit;
-    start->second->previous_node = {nullptr, NO_ROUTE, NO_DISTANCE, NO_TIME};
-    visit.push({start->second, NO_ROUTE, 0,NO_TIME});
+    std::stack<std::tuple<Point_ptr,RouteID, Distance>> visit;
+    start->second->previous_node = {nullptr, NO_ROUTE, NO_DISTANCE};
+    visit.push({start->second, NO_ROUTE, 0});
     bool loop_found = false;
     //last route is for tracking the last route followed
-    std::tuple<Point_ptr,RouteID, Distance, Time> last_route, second_last_route;
+    std::tuple<Point_ptr,RouteID, Distance> last_route, second_last_route;
 
     while (visit.size() != 0)
     {
@@ -899,7 +900,7 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_with_
                             visit.push(direct);
                             //in this case, this value should be assign by {std::get<0>(current),std::get<1>(direct),std::get<2>(direct),std::get<3>(direct)}
                             //but I want to optimize running time, so I would assign it to current, so actually it it one more previous point
-                            //A->B->C and this previous_node actually contains B but the value (ROUTE) are wrong, it is routing from A->B.
+                            //A->B->C and this previous_node actually contains B but the value (ROUTE and DISTANCE) are wrong, it is routing from A->B.
                             //copy constructor is more slower than assign to already exist value (by testing)
                             //and the final values are much easy to find (only one tracking)
                             std::get<0>(direct)->previous_node = current;
@@ -923,7 +924,7 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_with_
 
     //adding result;
     auto current = second_last_route;
-    std::vector<std::tuple<Point_ptr,RouteID, Distance, Time>> temp_vector;
+    std::vector<std::tuple<Point_ptr,RouteID, Distance>> temp_vector;
     temp_vector.push_back(last_route);
     while ((std::get<0>(current)) != start->second )
     {
@@ -974,13 +975,16 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
     {
         return {};
     }
+
     std::priority_queue<Route_Info_Distance,std::vector<Route_Info_Distance>,compare_distance> visit;
-    end->second->previous_node = {nullptr, NO_ROUTE, NO_DISTANCE, NO_TIME};
+    end->second->previous_node = {nullptr, NO_ROUTE, NO_DISTANCE};
+    start->second->color = global_gray;
     start->second->d = 0;
     std::vector<Point_ptr> visited_ptr;
-    std::tuple<Point_ptr, RouteID, Distance, Time> point = {start->second, NO_ROUTE, 0,NO_TIME};
-    visit.push({std::get<0>(point),std::get<1>(point),std::get<2>(point),NO_TIME});
+    visited_ptr.push_back(start->second);
+    visit.push({start->second, NO_ROUTE, 0});
     //last route is for tracking the last route followed
+    std::unordered_map<StopID,Distance> min_distance;
     std::tuple<StopID,RouteID, Distance> last_route ;
     while (visit.size() != 0)
     {
@@ -990,6 +994,8 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
         {
             goto end_loop;
         }
+        if (min_distance[std::get<0>(current)->id] < std::get<0>(current)->d )
+            continue;
         for (auto& direct : std::get<0>(current)->next_stop)
         {
             if (std::get<0>(direct) != nullptr)
@@ -997,21 +1003,23 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
                 if (*((std::get<0>(direct))->color) == WHITE)
                 {
                     visited_ptr.push_back(std::get<0>(direct));
-                    visit.push({std::get<0>(direct),std::get<1>(direct),std::get<2>(direct),NO_TIME});
+                    std::get<0>(direct)->color = global_gray;
+                    visit.push(direct);
                     //in this case, this value should be assign by {std::get<0>(current),std::get<1>(direct),std::get<2>(direct),std::get<3>(direct)}
                     //but I want to optimize running time, so I would assign it to current, so actually it it one more previous point
-                    //A->B->C and this previous_node actually contains B but the value (ROUTE) are wrong, it is routing from A->B.
+                    //A->B->C and this previous_node actually contains B but the values (ROUTE and DISTANCE) are wrong, it is routing from A->B.
                     //copy constructor is more slower than assign to already exist value (by testing)
                     //and the final values are much easy to find (only one tracking)
-                    if (std::get<0>(direct)->d > std::get<0>(current)->d + std::get<2>(direct))
-                    {
-                        std::get<0>(direct)->d = std::get<0>(current)->d + std::get<2>(direct);
-                        std::get<0>(direct)->previous_node = current;
-                    }
                 }
-                if (std::get<0>(direct)->id == tostop)
+                if (std::get<0>(direct)->d > std::get<0>(current)->d + std::get<2>(direct))
                 {
-                    last_route = {std::get<0>(direct)->id,std::get<1>(direct),std::get<2>(direct)};
+                    min_distance[std::get<0>(direct)->id] = std::get<0>(current)->d + std::get<2>(direct);
+                    std::get<0>(direct)->d = std::get<0>(current)->d + std::get<2>(direct);
+                    std::get<0>(direct)->previous_node = current;
+                    if (std::get<0>(direct)->id == tostop)
+                    {
+                        last_route = {tostop,std::get<1>(direct),std::get<2>(direct)};
+                    }
                 }
             }
         }
@@ -1025,10 +1033,9 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
         reset_distance(visited_ptr);
         return {};
     }
-
     //adding result;
     auto current = end->second->previous_node;
-    std::vector<std::tuple<Point_ptr,RouteID, Distance, Time>> temp_vector;
+    std::vector<std::tuple<Point_ptr,RouteID, Distance>> temp_vector;
     while ((std::get<0>(current)) != start->second )
     {
         temp_vector.push_back(current);
@@ -1043,7 +1050,6 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
 
     //tracking the last node
     result.push_back(last_route);
-
     for (auto iter = result.begin()+1; iter != result.end();iter++)
     {
         std::get<1>(*(iter-1))= std::get<1>(*(iter));
@@ -1058,8 +1064,19 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
 
 bool Datastructures::add_trip(RouteID routeid, std::vector<Time> const& stop_times)
 {
-    // Replace this comment and the line below with your implementation
-    return false;
+    auto trip = routes.find(routeid);
+    if (trip == routes.end())
+    {
+        return false;
+    }
+    if (trip->second.size() != stop_times.size())
+    {
+        return false;
+    }
+    for (auto stop : trip->second)
+    {
+        //auto stop_iter
+    }
 }
 
 std::vector<std::pair<Time, Duration>> Datastructures::route_times_from(RouteID routeid, StopID stopid)
