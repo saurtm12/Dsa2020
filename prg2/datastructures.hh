@@ -75,6 +75,7 @@ Duration const NO_DURATION = NO_VALUE;
 
 // Type for a distance (in metres)
 using Distance = int;
+Distance const MAX_DISTANCE = std::numeric_limits<int>::max();
 
 // Return value for cases where Duration is unknown
 Distance const NO_DISTANCE = NO_VALUE;
@@ -270,7 +271,7 @@ private:
         std::vector<std::tuple<Point_ptr,RouteID, Distance, Time>> next_stop;
         std::tuple<Point_ptr,RouteID, Distance, Time> previous_node ;
         std::shared_ptr <Color> color;
-        Distance d;
+        Distance d = MAX_DISTANCE;
         Time t;
         //constructor
         Point(const StopID& id_,const Name& name_,const Coord& coord_, V_ptr ptr_v_):
@@ -320,41 +321,15 @@ private:
     // phase 2:
     using Route = std::vector <StopID>;
     std::unordered_map<RouteID,Route> routes;
-
-    class Route_Info_Distance
-    {
-    public:
-        Route_Info_Distance(Point_ptr ptr_, RouteID id_, Distance distance_):
-            ptr(ptr_),
-            id(id_),
-            distance(distance_)
-        {
-
-        }
-        Point_ptr get0() const
-        {
-            return ptr;
-        }
-        RouteID get1() const
-        {
-            return id;
-        }
-        Distance get2() const
-        {
-            return distance;
-        }
-    private:
-        Point_ptr ptr;
-        RouteID id;
-        Distance distance;
-    };
+    using Route_Info_Distance = std::tuple<Point_ptr,RouteID, Distance, Time>;
     struct compare_distance
     {
-        bool operator()(const Route_Info_Distance& info1,const Route_Info_Distance& info2)
+        bool operator()(const Route_Info_Distance& info1,const std::tuple<Point_ptr,RouteID, Distance, Time>& info2)
         {
-            return info1.get2()>info2.get2();
+            return std::get<2>(info1) > std::get<2>(info2);
         }
     };
+    void reset_distance(std::vector<Point_ptr> vec);
 };
 
 
