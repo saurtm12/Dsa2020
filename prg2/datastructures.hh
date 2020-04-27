@@ -271,9 +271,7 @@ private:
         std::vector<std::tuple<Point_ptr,RouteID, Distance>> next_stop;
         std::tuple<Point_ptr,RouteID, Distance> previous_node ;
         std::shared_ptr <Color> color;
-        std::unordered_map<RouteID,Time> time_stop;
         Distance d = MAX_DISTANCE;
-        Time t;
         //constructor
         Point(const StopID& id_,const Name& name_,const Coord& coord_, V_ptr ptr_v_):
             id(id_),
@@ -331,6 +329,7 @@ private:
         }
     };
     void reset_distance(std::vector<Point_ptr> vec);
+    std::unordered_multimap<RouteID,std::vector<Time>> trips;
 };
 
 
