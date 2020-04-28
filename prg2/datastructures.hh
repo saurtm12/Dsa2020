@@ -267,11 +267,13 @@ private:
         V_ptr ptr_v;
         //phase2:
         using Point_ptr =  std::shared_ptr <Point>;
-      //  std::unordered_multimap<RouteID, std::pair<Distance,Point_ptr>> next_stop;
-        std::vector<std::tuple<Point_ptr,RouteID, Distance>> next_stop;
-        std::tuple<Point_ptr,RouteID, Distance> previous_node ;
+        std::unordered_multimap<Point_ptr,std::pair<RouteID, Distance>> next_stop;
+        //a map that has keys are RouteID, point to the next stop pointer, including depart time and arrival time.
+        std::unordered_multimap<Point_ptr, std::tuple<RouteID, Time, Time>> stop_time;
+        Point_ptr previous_node;
         std::shared_ptr <Color> color;
-        Distance d = MAX_DISTANCE;
+        Distance d;
+        Time arrive_time;
         //constructor
         Point(const StopID& id_,const Name& name_,const Coord& coord_, V_ptr ptr_v_):
             id(id_),
@@ -320,16 +322,6 @@ private:
     // phase 2:
     using Route = std::vector <StopID>;
     std::unordered_map<RouteID,Route> routes;
-    using Route_Info_Distance = std::tuple<Point_ptr,RouteID, Distance>;
-    struct compare_distance
-    {
-        bool operator()(const Route_Info_Distance& info1,const Route_Info_Distance& info2)
-        {
-            return std::get<0>(info1)->d > std::get<0>(info2)->d;
-        }
-    };
-    void reset_distance(std::vector<Point_ptr> vec);
-    std::unordered_multimap<RouteID,std::vector<Time>> trips;
 };
 
 
