@@ -980,6 +980,7 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
     {
         auto current = visit.top();
         visit.pop();
+        // end immediately when find optimal path.
         if (current->id == tostop)
         {
             goto end_loop;
@@ -1024,20 +1025,8 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
     std::vector<std::tuple<StopID,RouteID, Distance>> result;
     for (auto iter = temp.begin(); iter != temp.end()-1; iter++)
     {
-        auto pair = (*iter)->next_stop.equal_range(*(iter+1));
-        if (std::distance(pair.first,pair.second) == 1)
-        {
-            result.push_back({(*iter)->id, pair.first->second.first,pair.first->second.second});
-        }
-        else
-        {
-            auto find_route = std::min_element(pair.first, pair.second,
-                             [](auto const& lhs, auto const& rhs)
-            {
-                return (lhs.second).second < (rhs.second).second;
-            });
-            result.push_back({(*iter)->id, find_route->second.first, find_route->second.second});
-        }
+        auto find_stop = (*iter)->next_stop.find(*(iter+1));
+        result.push_back({(*iter)->id, find_stop->second.first, find_stop->second.second});
     }
     result.push_back({end->second->id, NO_ROUTE, 0});
 
@@ -1137,10 +1126,14 @@ std::vector<std::tuple<StopID, RouteID, Time> > Datastructures::journey_earliest
     {
         auto current = visit.top();
         visit.pop();
+        // stop when the optimal time_arrival is found
         if (current->id == tostop)
         {
             goto end_loop;
         }
+        // Because of one route can have duplicate times of stop ( there are more than 2 trips in a day)
+        // so there is problem that we are processing the route have been processed, this command is just
+        // a small optimization
         if (*current->color == BLACK )
         {
             continue;
@@ -1187,6 +1180,9 @@ std::vector<std::tuple<StopID, RouteID, Time> > Datastructures::journey_earliest
     std::vector<std::tuple<StopID,RouteID, Time>> result;
     Time  depart = starttime;
     Time last_arrival = starttime;
+    // make sure that we give the right result that have the right department time
+    //due to there are multiple routes have two stops consecutive are identical and
+    // there are multiple trips during a day.
     for (auto iter = temp.begin(); iter != temp.end()-1; iter++)
     {
         auto pair = (*iter)->stop_time.equal_range(*(iter+1));
