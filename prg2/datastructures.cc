@@ -1202,9 +1202,10 @@ std::vector<std::tuple<StopID, RouteID, Time> > Datastructures::journey_earliest
                     return false;
                 return std::get<2>(lhs.second) < std::get<2>(rhs.second);
             });
+            depart = std::get<2>(find_route->second);
             result.push_back({(*iter)->id, std::get<0>(find_route->second), std::get<1>(find_route->second)});
             if (iter == temp.end()-2)
-            last_arrival = std::get<2>(find_route->second);
+                last_arrival = std::get<2>(find_route->second);
         }
     }
     result.push_back({end->second->id, NO_ROUTE, last_arrival});
