@@ -1205,7 +1205,7 @@ std::vector<std::tuple<StopID, RouteID, Time> > Datastructures::journey_earliest
             auto find_route = std::min_element(pair.first, pair.second,
                              [&](auto const& lhs, auto const& rhs)
             {
-                if (std::get<2>(lhs.second) < depart)
+                if (std::get<1>(lhs.second) < depart)
                     return false;
                 return std::get<2>(lhs.second) < std::get<2>(rhs.second);
             });
