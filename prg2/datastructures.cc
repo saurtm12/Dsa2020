@@ -985,6 +985,12 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
         {
             goto end_loop;
         }
+    /*
+        if (*current->color = BLACK)
+        {
+            continue;
+        }
+    */
         for (auto& direct : current->next_stop)
         {
             if (direct.first != nullptr)
@@ -1000,6 +1006,7 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
                 {
                     direct.first->d = current->d + direct.second.second;
                     direct.first->previous_node = current;
+
                 }
             }
         }
