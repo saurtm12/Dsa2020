@@ -1200,13 +1200,23 @@ std::vector<std::tuple<StopID, RouteID, Time> > Datastructures::journey_earliest
         }
         else
         {
-            auto find_route = std::min_element(pair.first, pair.second,
-                             [&](auto const& lhs, auto const& rhs)
+            auto find_route = pair.first;
+            while (find_route != pair.second)
             {
-                if (std::get<1>(lhs.second) < depart)
-                    return false;
-                return std::get<2>(lhs.second) < std::get<2>(rhs.second);
-            });
+                if (depart <= std::get<1>(find_route->second) )
+                {
+                    break;
+                }
+                find_route++;
+            }
+            for (auto route = find_route; route != pair.second; route++)
+            {
+                if (depart <= std::get<1>(route->second)
+                        && std::get<2>(route->second) < std::get<2>(find_route->second))
+                {
+                    find_route = route;
+                }
+            }
             depart = std::get<2>(find_route->second);
             result.push_back({(*iter)->id, std::get<0>(find_route->second), std::get<1>(find_route->second)});
             if (iter == temp.end()-2)
