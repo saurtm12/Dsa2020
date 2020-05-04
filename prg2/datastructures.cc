@@ -980,11 +980,10 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
     {
         auto current = visit.top();
         visit.pop();
-        // end immediately when find optimal path.
         if (*current->color == BLACK)
         {
             continue;
-        }
+        // end immediately when find optimal path.
         if (current->id == tostop)
         {
             goto end_loop;
