@@ -980,6 +980,10 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
     {
         auto current = visit.top();
         visit.pop();
+        if (*current->color == BLACK )
+        {
+            continue;
+        }
         // end immediately when find optimal path.
         if (current->id == tostop)
         {
@@ -1000,6 +1004,7 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
                 {
                     direct.first->d = current->d + direct.second.second;
                     direct.first->previous_node = current;
+                    visit.push(direct.first);
                 }
             }
         }
