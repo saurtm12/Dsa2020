@@ -981,10 +981,6 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
         auto current = visit.top();
         visit.pop();
         // end immediately when find optimal path.
-        if (*current->color == BLACK)
-        {
-            continue;
-        }
         if (current->id == tostop)
         {
             goto end_loop;
@@ -1004,7 +1000,6 @@ std::vector<std::tuple<StopID, RouteID, Distance>> Datastructures::journey_short
                 {
                     direct.first->d = current->d + direct.second.second;
                     direct.first->previous_node = current;
-                    visit.push(direct.first)
                 }
             }
         }
@@ -1131,11 +1126,6 @@ std::vector<std::tuple<StopID, RouteID, Time> > Datastructures::journey_earliest
     {
         auto current = visit.top();
         visit.pop();
-        // stop when the optimal time_arrival is found
-        if (current->id == tostop)
-        {
-            goto end_loop;
-        }
         // Because of one route can have duplicate times of stop ( there are more than 2 trips in a day)
         // so there is problem that we are processing the route have been processed, this command is just
         // a small optimization
@@ -1143,6 +1133,12 @@ std::vector<std::tuple<StopID, RouteID, Time> > Datastructures::journey_earliest
         {
             continue;
         }
+        // stop when the optimal time_arrival is found
+        if (current->id == tostop)
+        {
+            goto end_loop;
+        }
+
         for (auto& direct : current->stop_time)
         {
             if (direct.first != nullptr && std::get<1>(direct.second) >= current->arrive_time)
