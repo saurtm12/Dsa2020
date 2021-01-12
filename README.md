@@ -1,7 +1,8 @@
-# Olet onnistuneesti hakenut päivitykset upstream repositorysta
-
-# You have successfully pulled updates from the upstream repository
-
+# Repository info:
+prg1: Phase 1
+prog2: Phase 2
+Phase 2 is a continuation of phase 1, the course made a seperation to grade easier.
+The project contain an UI about the stops. If you want to use UI, use Qt creator. The other option is that normal compiling with gcc/g++ then run as command line.
 # NOTE! About available test files in prg1
 
 Short explanation of test files:
